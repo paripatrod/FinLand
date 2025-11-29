@@ -117,6 +117,11 @@ export default function OnboardingTutorial() {
     navigate('/');
   };
 
+  // Don't render if not visible
+  if (!isVisible) {
+    return null;
+  }
+
   const step = tutorialSteps[currentStep];
 
   return (
