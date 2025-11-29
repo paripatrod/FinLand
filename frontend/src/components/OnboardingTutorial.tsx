@@ -171,6 +171,7 @@ export default function OnboardingTutorial() {
           
           {/* Close Button */}
           <button
+            type="button"
             onClick={handleSkip}
             className="absolute top-4 right-4 z-20 p-2 bg-white/80 dark:bg-gray-700/80 hover:bg-white dark:hover:bg-gray-600 rounded-full transition-all shadow-sm"
           >
@@ -256,6 +257,7 @@ export default function OnboardingTutorial() {
           {/* Footer Buttons */}
           <div className="flex items-center justify-between px-6 pb-6 sm:px-8 sm:pb-8">
             <button
+              type="button"
               onClick={handlePrev}
               disabled={currentStep === 0}
               className={`flex items-center gap-1 px-4 py-2.5 rounded-xl font-medium transition-all text-sm ${
@@ -269,8 +271,9 @@ export default function OnboardingTutorial() {
             </button>
 
             <button
+              type="button"
               onClick={handleNext}
-              className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${step.gradient} text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all text-sm`}
+              className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${step.gradient} text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all text-sm z-10`}
             >
               {currentStep === tutorialSteps.length - 1 ? (
                 <>
@@ -289,6 +292,7 @@ export default function OnboardingTutorial() {
 
         {/* Skip Link */}
         <motion.button
+          type="button"
           onClick={handleSkip}
           className="w-full mt-4 text-center text-sm text-gray-400 hover:text-white transition-colors"
           initial={{ opacity: 0 }}
