@@ -1,0 +1,64 @@
+{
+  "name": "FinLand - AI วิเคราะห์หนี้",
+  "short_name": "FinLand",
+  "description": "แอปคำนวณหนี้ออนไลน์ฟรี พร้อม AI วิเคราะห์โปรไฟล์หนี้ คำนวณบัตรเครดิต กยศ. Student Loan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Pedro.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "utilities", "productivity"],
+  "lang": "th",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "/Pedro.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "หน้าแรก FinLand"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "คำนวณบัตรเครดิต",
+      "short_name": "บัตรเครดิต",
+      "description": "คำนวณระยะเวลาปิดหนี้บัตรเครดิต",
+      "url": "/credit-card",
+      "icons": [{ "src": "/Pedro.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "คำนวณ กยศ.",
+      "short_name": "กยศ.",
+      "description": "คำนวณค่างวด กยศ. Student Loan",
+      "url": "/student-loan",
+      "icons": [{ "src": "/Pedro.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "ประวัติการคำนวณ",
+      "short_name": "ประวัติ",
+      "description": "ดูประวัติการคำนวณทั้งหมด",
+      "url": "/dashboard",
+      "icons": [{ "src": "/Pedro.png", "sizes": "512x512" }]
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

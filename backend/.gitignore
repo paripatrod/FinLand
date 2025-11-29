@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Model files (if you want to ignore them)
+# model.pkl
+
+# Logs
+*.log
+
+model.pkl

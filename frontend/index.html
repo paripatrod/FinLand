@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/Pedro.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+
+    <!-- SEO Meta Tags -->
+    <title>
+      FinLand | คำนวณบัตรเครดิต กยศ. ฟรี พร้อม AI วิเคราะห์
+    </title>
+    <meta
+      name="description"
+      content="FinLand - แอปคำนวณหนี้ฟรี 100% คำนวณบัตรเครดิต กยศ. Student Loan พร้อม AI วิเคราะห์โปรไฟล์หนี้ ดูกราฟแบบ Interactive ดาวน์โหลด CSV/PDF ใช้งานง่าย รองรับทุกอุปกรณ์"
+    />
+    <meta
+      name="keywords"
+      content="FinLand, เครื่องคำนวณการเงิน, คำนวณบัตรเครดิต, คำนวณกยศ, Student Loan Calculator, ดอกเบี้ย, ผ่อนชำระ, AI วิเคราะห์หนี้, financial calculator thailand"
+    />
+    <meta name="author" content="YDP Eduvice Fellowship" />
+    <meta name="robots" content="index, follow" />
+    <link
+      rel="canonical"
+      href="https://financial-calculator-thailand.vercel.app/"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://financial-calculator-thailand.vercel.app/"
+    />
+    <meta
+      property="og:title"
+      content="FinLand | คำนวณบัตรเครดิต กยศ. ฟรี"
+    />
+    <meta
+      property="og:description"
+      content="คำนวณบัตรเครดิต กยศ. Student Loan ฟรี พร้อม AI วิเคราะห์โปรไฟล์หนี้ ใช้งานง่าย รองรับมือถือ"
+    />
+    <meta name="msapplication-TileColor" content="#10b981" />
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/Pedro.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="FinLand" />
+
+    <!-- Performance & Security -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "FinLand",
+        "description": "FinLand - แอปคำนวณหนี้ฟรี 100% คำนวณบัตรเครดิต กยศ. Student Loan พร้อม AI วิเคราะห์โปรไฟล์หนี้",
+        "url": "https://financial-calculator-thailand.vercel.app/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "THB"
+        },
+        "featureList": [
+          "คำนวณบัตรเครดิต",
+          "คำนวณกยศ./Student Loan",
+          "AI วิเคราะห์โปรไฟล์หนี้",
+          "กราฟแสดงผล Interactive",
+          "ดาวน์โหลดตาราง CSV",
+          "รองรับมือถือ"
+        ],
+        "inLanguage": "th-TH",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "softwareVersion": "4.1.0",
+        "author": {
+          "@type": "Organization",
+          "name": "YDP Eduvice Fellowship"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+              console.log("✅ Service Worker registered:", registration.scope);
+            })
+            .catch((error) => {
+              console.log("❌ Service Worker registration failed:", error);
+            });
+        });
+      }
+    </script>
+
+    <!-- Accessibility: Skip to main content -->
+    <noscript>
+      <div
+        style="
+          padding: 20px;
+          background: #fef3c7;
+          border: 2px solid #f59e0b;
+          margin: 20px;
+          border-radius: 8px;
+        "
+      >
+        <h2 style="color: #92400e">⚠️ JavaScript Required</h2>
+        <p style="color: #78350f">
+          FinLand ต้องการ JavaScript เพื่อทำงาน กรุณาเปิดใช้งาน
+          JavaScript ในเบราว์เซอร์ของคุณนะครับ
+        </p>
+        <p style="color: #78350f">
+          This financial calculator requires JavaScript to function. Please
+          enable JavaScript in your browser.
+        </p>
+      </div>
+    </noscript>
+  </body>
+</html>
