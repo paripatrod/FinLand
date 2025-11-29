@@ -80,6 +80,7 @@ const tutorialSteps: TutorialStep[] = [
 export default function OnboardingTutorial() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isClosing, setIsClosing] = useState(false);
   const { language, t } = useLanguage();
   const navigate = useNavigate();
 
@@ -107,14 +108,19 @@ export default function OnboardingTutorial() {
 
   const handleComplete = () => {
     localStorage.setItem('hasSeenTutorial', 'true');
-    setIsVisible(false);
-    navigate('/');
+    setIsClosing(true);
+    // Wait for animation to finish before hiding
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
   };
 
   const handleSkip = () => {
     localStorage.setItem('hasSeenTutorial', 'true');
-    setIsVisible(false);
-    navigate('/');
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
   };
 
   // Don't render if not visible
@@ -128,13 +134,13 @@ export default function OnboardingTutorial() {
     <motion.div 
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-gray-900/60 backdrop-blur-md"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      animate={{ opacity: isClosing ? 0 : 1 }}
+      transition={{ duration: 0.3 }}
     >
       <motion.div 
         className="relative w-full max-w-md overflow-hidden"
         initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
+        animate={{ scale: isClosing ? 0.9 : 1, y: isClosing ? 20 : 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       >
         {/* Main Card */}
