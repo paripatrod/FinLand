@@ -16,7 +16,7 @@ import {
   Target
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface TutorialStep {
   id: number;
@@ -83,14 +83,20 @@ export default function OnboardingTutorial() {
   const [isClosing, setIsClosing] = useState(false);
   const { language, t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if we're on /tutorial page (force show) or overlay mode
+  const isDirectAccess = location.pathname === '/tutorial';
 
   useEffect(() => {
-    // Check if user has seen tutorial
-    const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
-    if (hasSeenTutorial === 'true') {
-      setIsVisible(false);
+    // Only check localStorage if NOT accessing /tutorial directly
+    if (!isDirectAccess) {
+      const hasSeenTutorial = localStorage.getItem('hasSeenTutorial');
+      if (hasSeenTutorial === 'true') {
+        setIsVisible(false);
+      }
     }
-  }, []);
+  }, [isDirectAccess]);
 
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
@@ -109,9 +115,12 @@ export default function OnboardingTutorial() {
   const handleComplete = () => {
     localStorage.setItem('hasSeenTutorial', 'true');
     setIsClosing(true);
-    // Wait for animation to finish before hiding
+    // Wait for animation to finish before hiding/navigating
     setTimeout(() => {
       setIsVisible(false);
+      if (isDirectAccess) {
+        navigate('/');
+      }
     }, 300);
   };
 
@@ -120,11 +129,19 @@ export default function OnboardingTutorial() {
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
+      if (isDirectAccess) {
+        navigate('/');
+      }
     }, 300);
   };
 
-  // Don't render if not visible
-  if (!isVisible) {
+  // Don't render if not visible (only for overlay mode)
+  if (!isVisible && !isDirectAccess) {
+    return null;
+  }
+  
+  // If closing and direct access, still show until animation completes
+  if (!isVisible && isDirectAccess) {
     return null;
   }
 
