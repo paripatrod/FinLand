@@ -178,57 +178,46 @@ export default function OnboardingTutorial() {
             <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
 
-          {/* Content */}
-          <div className="relative z-10 px-6 pt-12 pb-6 sm:px-8 sm:pt-14 sm:pb-8">
+          {/* Content - Fixed Height Container */}
+          <div className="relative z-10 px-6 pt-12 pb-6 sm:px-8 sm:pt-14 sm:pb-8 min-h-[320px] sm:min-h-[340px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
                 className="text-center"
               >
                 {/* Emoji */}
-                <motion.div
-                  className="text-5xl sm:text-6xl mb-4"
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', damping: 10, delay: 0.1 }}
-                >
+                <div className="text-5xl sm:text-6xl mb-4">
                   {step.emoji}
-                </motion.div>
+                </div>
 
                 {/* Icon Badge */}
-                <motion.div
+                <div
                   className={`inline-flex items-center justify-center p-3 bg-gradient-to-br ${step.gradient} rounded-2xl text-white mb-5 shadow-lg`}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', damping: 12, delay: 0.15 }}
                 >
                   {step.icon}
-                </motion.div>
+                </div>
 
                 {/* Step Counter */}
-                <motion.div 
+                <div 
                   className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs font-medium text-gray-500 dark:text-gray-400 mb-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
                 >
                   <span>ขั้นตอน</span>
                   <span className="text-gray-900 dark:text-white font-bold">{currentStep + 1}</span>
                   <span>/</span>
                   <span>{tutorialSteps.length}</span>
-                </motion.div>
+                </div>
 
                 {/* Title */}
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                   {language === 'th' ? step.title : step.titleEn}
                 </h2>
 
-                {/* Description */}
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto">
+                {/* Description - Fixed Height */}
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-sm mx-auto min-h-[48px]">
                   {language === 'th' ? step.description : step.descriptionEn}
                 </p>
               </motion.div>
