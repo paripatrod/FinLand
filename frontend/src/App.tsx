@@ -10,6 +10,7 @@ import Home from './components/Home';
 import AnimatedBackground from './components/ui/AnimatedBackground';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import ErrorBoundary from './components/ErrorBoundary';
+import OfflineIndicator from './components/OfflineIndicator';
 
 // Lazy load heavy components for better performance
 const CreditCardCalculator = lazy(() => import('./components/CreditCardCalculator'));
@@ -56,6 +57,7 @@ function App() {
           </Layout>
         </LanguageProvider>
       </ThemeProvider>
+      <OfflineIndicator />
       <Analytics />
     </ErrorBoundary>
   );

@@ -1,144 +1,159 @@
-# 💰 FinLand
-## AI-Powered Debt Management & Financial Planning Platform
+# FinLand
 
-![Version](https://img.shields.io/badge/version-5.0.0-blue)
+**AI-Powered Financial Calculator & Debt Management Platform**
+
+![Version](https://img.shields.io/badge/version-5.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Python](https://img.shields.io/badge/python-3.14-blue)
+![Python](https://img.shields.io/badge/python-3.13-blue)
 ![React](https://img.shields.io/badge/react-18-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0-blue)
-![AI R²](https://img.shields.io/badge/AI%20R²-98.80%25-brightgreen)
-![Training](https://img.shields.io/badge/Training-1M%20samples-orange)
+![AI Accuracy](https://img.shields.io/badge/AI%20R²-98.80%25-brightgreen)
 ![Status](https://img.shields.io/badge/status-Production-success)
 
-**แอปคำนวณหนี้ออนไลน์ฟรี 100%** พร้อม AI Financial Advisor วิเคราะห์การเงิน 21 มิติ  
-Train ด้วย 1 ล้าน samples ครอบคลุมทุกสถานการณ์การเงินในประเทศไทย
+A comprehensive financial planning application with AI-powered analysis. Calculate credit card payoff, student loans, and receive personalized financial advice based on 21-dimensional analysis trained on 1 million samples.
 
-🌐 **Live Demo**: [financial-calculator-app.vercel.app](https://financial-calculator-app.vercel.app)  
-📦 **GitHub**: [github.com/paripatrod/FinLand](https://github.com/paripatrod/FinLand)  
-🤖 **AI Model**: [Hugging Face - Pottersk/finland-ai-model](https://huggingface.co/Pottersk/finland-ai-model)
+**Live Demo**: [finland.vercel.app](https://finland.vercel.app)
 
 ---
 
-## ✨ Key Features
+## Problem Statement
 
-### 🧮 Financial Calculators
+Thailand faces a growing debt crisis:
+- **91.4%** of Thai population has debt (Bank of Thailand, 2024)
+- **3.9 million** student loan borrowers (กยศ.)
+- Average household debt: **฿500,000+**
+- Lack of accessible financial planning tools in Thai language
 
-| Feature | Description |
-|---------|-------------|
-| **บัตรเครดิต** | คำนวณระยะเวลาปิดหนี้พร้อมดอกเบี้ยแบบละเอียด |
-| **กยศ./Student Loan** | คำนวณค่างวดรายเดือนทุกประเภทสินเชื่อ |
-| **What-If Analysis** | ทดสอบสถานการณ์ "ถ้าจ่ายเพิ่ม" ด้วย Interactive Slider |
-| **กราฟ Interactive** | แสดงยอดคงเหลือและดอกเบี้ยแต่ละเดือน |
-| **ดาวน์โหลด CSV** | ส่งออกตารางการผ่อนชำระ |
-
-### 🤖 AI Financial Advisor v3.0 (NEW!)
-
-| Feature | Description |
-|---------|-------------|
-| **21 มิติการวิเคราะห์** | ครอบคลุมทุกแง่มุมสถานะการเงิน |
-| **AI Chatbot** | ถามคำถามและรับคำแนะนำแบบ Real-time |
-| **Health Score** | คะแนนสุขภาพการเงิน 0-100 |
-| **Stress Index** | ดัชนีความเครียดจากหนี้ |
-| **Smart Payment** | แนะนำจำนวนเงินที่ควรจ่ายเพิ่ม |
-| **Payoff Strategy** | กลยุทธ์ปิดหนี้ที่เหมาะสม |
-
-### 📱 Platform Features
-
-| Feature | Description |
-|---------|-------------|
-| **Multi-language** | รองรับ ไทย, English, 中文, 日本語 |
-| **Advanced Theming** | 4 ธีม + Dark Mode |
-| **PWA Support** | ติดตั้งเป็นแอพบนมือถือ |
-| **Calculation History** | บันทึกประวัติพร้อม Dashboard Analytics |
-| **Export/Import** | ส่งออก/นำเข้าข้อมูล JSON |
-| **Responsive Design** | ใช้งานได้ทุกอุปกรณ์ |
+Most financial tools are complex, English-only, or require paid subscriptions.
 
 ---
 
-## 🧠 AI Financial Advisor v3.0
+## Solution
 
-### Model Performance
-
-| Metric | Value | Status |
-|--------|-------|--------|
-| **Algorithm** | RandomForest + MultiOutputRegressor | ✅ |
-| **Regression R²** | 98.80% | ✅ Exceeds 95% target |
-| **Classification Accuracy** | 96.54% | ✅ Exceeds 90% target |
-| **Model Size** | 3.46 MB | ✅ Under 5MB target |
-| **Training Samples** | 1,000,000 | ✅ Comprehensive coverage |
-| **Predictions** | 21 dimensions | ✅ Full financial analysis |
-
-### 🔮 21 Predictions (AI วิเคราะห์)
-
-| กลุ่ม | Predictions | รายละเอียด |
-|-------|-------------|------------|
-| **【A】หนี้** | 5 | ปลดหนี้กี่เดือน, จ่ายเพิ่มเท่าไร, เวลา/เงินประหยัด, ภาระดอกเบี้ย |
-| **【B】สุขภาพ** | 4 | คะแนนสุขภาพ, เครียด, มั่นคง, ศักยภาพสร้างความมั่งคั่ง |
-| **【C】แผน** | 4 | เงินสำรอง, ออมเงิน, พร้อมลงทุน, เกษียณ |
-| **【D】เปรียบเทียบ** | 2 | Percentile, ดีกว่าค่าเฉลี่ย |
-| **【E】ผลกระทบ** | 2 | เครดิตสกอร์, คุณภาพชีวิต |
-| **【F】กลยุทธ์** | 4 | วิธีปิดหนี้, ทำก่อน, ความเร่งด่วน, ต้องการช่วยเหลือ |
-
-### Strategy Labels
-
-| Code | กลยุทธ์ | คำอธิบาย |
-|------|---------|----------|
-| 0 | Standard | จ่ายตามปกติ |
-| 1 | Accelerated | เร่งปิดหนี้ |
-| 2 | Avalanche | จ่ายดอกสูงก่อน |
-| 3 | Snowball | จ่ายยอดน้อยก่อน |
-| 4 | Consolidate | รวมหนี้ |
-| 5 | Crisis | ขอความช่วยเหลือด่วน |
+**FinLand** provides free, AI-powered financial planning:
+- Simple debt payoff calculators in Thai
+- AI analysis trained on 1 million Thai financial scenarios
+- Personalized recommendations based on local context
+- Accessible on any device (PWA support)
 
 ---
 
-## 🚀 Quick Start
+## Target Users
+
+| Segment | Description | Pain Point |
+|---------|-------------|------------|
+| **Working Professionals** | Age 25-45, credit card debt | High interest, unclear payoff timeline |
+| **Student Loan Borrowers** | กยศ./กรอ. graduates | Complex repayment terms |
+| **First-time Investors** | Want to start investing | Don't know if they're debt-free ready |
+| **Financial Advisors** | Need quick analysis tools | Time-consuming manual calculations |
+
+---
+
+## Features
+
+### Financial Calculators
+- **Credit Card Calculator** - Calculate payoff timeline with detailed interest breakdown
+- **Student Loan Calculator** - Monthly payment calculation for all loan types (including Thai Student Loan Fund)
+- **What-If Analysis** - Interactive slider to simulate different payment scenarios
+- **Visualization** - Charts showing balance and interest over time
+- **Export** - Download payment schedules as CSV
+
+### AI Financial Advisor v4.0
+- **21-Dimension Analysis** - Comprehensive financial health assessment
+- **Health Score** - Financial wellness rating (0-100)
+- **Smart Payment Recommendations** - Optimal payment suggestions
+- **Risk Assessment** - DTI ratio and stress index analysis
+- **Strategy Recommendations** - Personalized debt payoff strategies
+- **AI Chat** - Real-time financial Q&A powered by Gemini
+
+### Platform
+- **Multi-language** - Thai, English, Chinese, Japanese
+- **Dark Mode** - Multiple theme options
+- **PWA** - Installable as mobile app
+- **Responsive** - Works on all devices
+- **Offline Support** - Basic calculations work offline
+- **Accessibility** - ARIA labels and screen reader support
+
+---
+
+## AI Model Performance
+
+| Metric | Value |
+|--------|-------|
+| Algorithm | RandomForest + MultiOutputRegressor |
+| Regression R² | 98.80% |
+| Classification Accuracy | 96.54% |
+| Training Samples | 1,000,000 |
+| Model Size | 3.46 MB |
+| Predictions | 21 dimensions |
+
+### Analysis Categories
+
+| Category | Predictions |
+|----------|-------------|
+| Debt Analysis | Payoff timeline, smart payment boost, savings potential |
+| Financial Health | Health score, stress index, stability score |
+| Planning | Emergency fund needs, savings rate, investment readiness |
+| Strategy | Payoff method, priority actions, urgency level |
+
+### Strategy Types
+
+| Strategy | Description |
+|----------|-------------|
+| Standard | Regular payments |
+| Accelerated | Fast-track debt payoff |
+| Avalanche | Pay highest interest first |
+| Snowball | Pay smallest balance first |
+| Consolidate | Combine debts |
+| Crisis | Seek immediate assistance |
+
+---
+
+## Quick Start
 
 ### Prerequisites
+- Python 3.13+
+- Node.js 18+
+- npm 9+
 
-| Requirement | Version |
-|-------------|---------|
-| Python | 3.13+ |
-| Node.js | 18+ |
-| npm | 9+ |
+### Backend Setup
 
-### Backend Setup (Flask + Python)
-
-```powershell
+```bash
 cd backend
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+source .venv/bin/activate  # Windows: .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python app.py
 ```
 
-> Backend runs at `http://127.0.0.1:5000`
+Backend runs at `http://127.0.0.1:5000`
 
-### Frontend Setup (React + Vite)
+### Frontend Setup
 
-```powershell
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-> Frontend runs at `http://localhost:5173`
+Frontend runs at `http://localhost:3000`
 
 ---
 
-## 📡 API Endpoints
+## API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/calculate/credit-card` | Credit card calculation |
-| `POST` | `/api/calculate/student-loan` | Student loan calculation |
-| `POST` | `/api/ai-analyze` | 🧠 AI Financial Advisor v4.0 |
-| `POST` | `/api/ai-chat` | 💬 AI Chatbot with insights |
-| `GET` | `/api/health` | Health check with model status |
+| POST | `/api/calculate/credit-card` | Credit card payoff calculation |
+| POST | `/api/calculate/student-loan` | Student loan calculation |
+| POST | `/api/ai-analyze` | AI financial analysis (21 dimensions) |
+| POST | `/api/ai-chat` | AI chatbot with financial insights |
+| GET | `/api/health` | Service health check |
 
-### AI Analyze Request
+### Example Request
 
 ```json
+POST /api/ai-analyze
 {
   "loan_amount": 100000,
   "interest_rate": 18,
@@ -149,191 +164,182 @@ npm run dev
 }
 ```
 
-### AI Analyze Response
+### Example Response
 
 ```json
 {
   "success": true,
-  "version": "3.0.0",
-  "training_samples": 850000,
+  "version": "4.0.0",
+  "financial_health": {
+    "health_score": 65,
+    "debt_stress_index": 44,
+    "stability_score": 68
+  },
   "debt_analysis": {
     "debt_freedom_months": 49,
     "smart_payment_boost": 9200,
     "time_saved_months": 30,
-    "money_saved_total": 38000,
-    "interest_burden_ratio": 45
-  },
-  "financial_health": {
-    "health_score": 65,
-    "debt_stress_index": 44,
-    "stability_score": 68,
-    "wealth_potential": 61
+    "money_saved_total": 38000
   },
   "strategy": {
-    "payoff_strategy": "Avalanche - จ่ายดอกสูงก่อน",
-    "primary_action": "📉 ลดดอกเบี้ย",
-    "urgency_level": "🔴 ด่วนมาก"
+    "payoff_strategy": "Avalanche",
+    "primary_action": "Reduce interest rate",
+    "urgency_level": "High"
   }
 }
 ```
 
 ---
 
-## 🤖 AI Model Setup
-
-### Auto-Download from Hugging Face ⭐ Recommended
-
-Set environment variable:
-
-```bash
-MODEL_URL=https://huggingface.co/Pottersk/finland-ai-model/resolve/main/financial_advisor_model.pkl
-```
-
-> Model auto-downloads on first request (3.46 MB)
-
-### Train Your Own Model
-
-```powershell
-cd backend
-python train_financial_advisor.py
-```
-
-> Generates `financial_advisor_model.pkl` (3.46 MB, 98.80% R², 1M samples)
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
-
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Flask | 3.0 | Python web framework |
-| Flask-CORS | 4.0 | Cross-origin support |
-| Flask-Limiter | 3.5 | API rate limiting |
-| scikit-learn | 1.5 | AI model (RandomForest + MultiOutput) |
-| NumPy | 1.26 | Numerical computing |
-| joblib | 1.3 | Model serialization |
-| google-generativeai | 0.8 | AI Chatbot (Gemini) |
+| Technology | Purpose |
+|------------|---------|
+| Flask 3.0 | Web framework |
+| scikit-learn 1.5 | AI model (RandomForest) |
+| Flask-CORS | Cross-origin support |
+| Flask-Limiter | Rate limiting |
+| Google Generative AI | Chatbot (Gemini) |
 
 ### Frontend
-
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 18 | UI framework |
-| TypeScript | 5.0 | Type safety |
-| Vite | 5.0 | Build tool |
-| Tailwind CSS | 3.4 | Styling |
-| Framer Motion | 12 | Animations |
-| Recharts | 3.5 | Charts |
-| React Router | 6 | Navigation |
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI framework |
+| TypeScript 5.0 | Type safety |
+| Vite 5.0 | Build tool |
+| Tailwind CSS 3.4 | Styling |
+| Recharts | Data visualization |
+| React Router 6 | Navigation |
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 FinLand/
-├── 📂 backend/
-│   ├── app.py                         # Flask API + AI Advisor v4.0
-│   ├── train_model.py                 # Model training (1M samples)
-│   ├── requirements.txt               # Python dependencies
-│   └── runtime.txt                    # Python version
+├── backend/
+│   ├── app.py                    # Flask API server
+│   ├── train_model.py            # Model training script
+│   ├── requirements.txt          # Python dependencies
+│   └── runtime.txt               # Python version
 │
-├── 📂 frontend/
-│   ├── 📂 src/
-│   │   ├── 📂 components/
-│   │   │   ├── CreditCardCalculator.tsx  # + AI Analysis
-│   │   │   ├── StudentLoanCalculator.tsx # + AI Analysis
-│   │   │   ├── AIAdvisor.tsx             # AI chatbot
-│   │   │   ├── Dashboard.tsx             # Analytics
-│   │   │   └── 📂 ui/                    # UI components
-│   │   ├── 📂 contexts/
-│   │   │   ├── ThemeContext.tsx          # 4 themes
-│   │   │   └── LanguageContext.tsx       # 4 languages
-│   │   └── 📂 utils/
-│   │       ├── api.ts                    # API client
-│   │       └── storage.ts                # Local storage
+├── frontend/
+│   ├── src/
+│   │   ├── components/           # React components
+│   │   ├── contexts/             # Theme & Language providers
+│   │   ├── types/                # TypeScript definitions
+│   │   ├── utils/                # API & storage utilities
+│   │   └── test/                 # Test setup
+│   ├── public/                   # Static assets & PWA
 │   └── package.json
 │
-├── vercel.json                           # Vercel config
+├── vercel.json                   # Deployment config
 └── README.md
 ```
 
 ---
 
-## 📊 Deployment Status
+## Deployment
 
-| Service | Platform | Status | URL |
-|---------|----------|--------|-----|
-| **Frontend** | Vercel | 🟢 Live | [financial-calculator-app.vercel.app](https://financial-calculator-app.vercel.app) |
-| **Backend API** | Render | 🟢 Live | [finland-backend.onrender.com](https://finland-backend.onrender.com) |
-| **AI Model** | Hugging Face | 🟢 Live | [Pottersk/finland-ai-model](https://huggingface.co/Pottersk/finland-ai-model) |
-
----
-
-## 🚀 Latest Updates (v5.0.0) - November 2025
-
-### 🧠 AI Financial Advisor v3.0
-
-| Update | Before | After |
-|--------|--------|-------|
-| **Training Samples** | 100K | **1,000,000** |
-| **Predictions** | 1 (profile) | **21 dimensions** |
-| **Regression R²** | N/A | **98.80%** |
-| **Classification** | 89.96% | **96.54%** |
-| **Model Size** | 3.23 MB | **3.46 MB** |
-| **Features** | 29 | **30** |
-
-### 🔮 New AI Capabilities
-
-- ✅ Debt freedom timeline prediction
-- ✅ Smart payment boost recommendation  
-- ✅ Financial health score (0-100)
-- ✅ Debt stress index
-- ✅ Investment readiness score
-- ✅ Retirement gap analysis
-- ✅ Percentile ranking
-- ✅ Payoff strategy recommendation
-- ✅ Urgency level assessment
-- ✅ AI-powered chatbot with insights
+| Service | Platform | URL |
+|---------|----------|-----|
+| Frontend | Vercel | [finland.vercel.app](https://finland.vercel.app) |
+| Backend | Render | finland-ilb5.onrender.com |
+| AI Model | Hugging Face | [Pottersk/finland-ai-model](https://huggingface.co/Pottersk/finland-ai-model) |
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
-### Backend (.env)
-
+### Backend
 ```bash
-# Required
 MODEL_URL=https://huggingface.co/Pottersk/finland-ai-model/resolve/main/financial_advisor_model.pkl
+GEMINI_API_KEY=your-api-key  # Optional: for AI chat
+```
 
-# Optional
-FLASK_ENV=production
-GEMINI_API_KEY=your-gemini-api-key  # For AI Chat
+### Frontend
+```bash
+VITE_API_URL=https://finland-ilb5.onrender.com
 ```
 
 ---
 
-## 📋 Model Summary
+## Testing
 
-| Specification | Value |
-|---------------|-------|
-| **Version** | 3.0.0 |
-| **Regression R²** | 98.80% |
-| **Classification** | 96.54% |
-| **Model Size** | 3.46 MB |
-| **Training Samples** | 1,000,000 |
-| **Algorithm** | RandomForest + MultiOutputRegressor |
-| **Predictions** | 21 dimensions |
-| **Download** | [huggingface.co/Pottersk/finland-ai-model](https://huggingface.co/Pottersk/finland-ai-model) |
+```bash
+cd frontend
+npm test           # Run tests
+npm run test:ui    # Run with UI
+npm run coverage   # Generate coverage report
+```
+
+Current coverage: 32 tests passing
 
 ---
 
-<div align="center">
+## Changelog
 
-**© 2025 YDP Eduvice Fellowship — FinLand**
+### v5.1.0 (November 2025)
+- Complete i18n support (TH/EN/ZH/JA)
+- Security improvements (CORS, CSP headers)
+- Accessibility enhancements (ARIA labels)
+- TypeScript strict typing
+- Test coverage improvements
+- PWA icon updates
+- SEO optimization (sitemap, robots.txt)
 
-Made with ❤️ for Thai Financial Literacy
+### v5.0.0
+- AI Financial Advisor v4.0 with 21-dimension analysis
+- 1M training samples
+- What-If analysis integration
+- AI chatbot with Gemini
 
-</div>
+---
+
+## Roadmap
+
+| Phase | Timeline | Features |
+|-------|----------|----------|
+| **v5.2** | Dec 2025 | Bank connection API, expense tracking |
+| **v5.3** | Q1 2026 | Investment portfolio analysis |
+| **v6.0** | Q2 2026 | Mobile app (React Native) |
+| **Future** | 2026+ | Multi-debt management, family finance |
+
+---
+
+## Security
+
+- CORS restricted to specific origins
+- Content Security Policy headers
+- Rate limiting on API endpoints
+- Input sanitization
+- No sensitive data stored
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -m 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+---
+
+## Acknowledgments
+
+- **YDP Eduvice Fellowship** - Project sponsorship
+- **Bank of Thailand** - Financial literacy resources
+- **Thai Student Loan Fund (กยศ.)** - Loan calculation references
+
+---
+
+**© 2025 YDP Eduvice Fellowship**
