@@ -21,9 +21,11 @@
     "react-countup": "^6.5.3",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-markdown": "^10.1.0",
     "react-number-format": "^5.4.4",
     "react-router-dom": "^6.20.0",
     "recharts": "^3.5.0",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7"
   },
   "devDependencies": {
