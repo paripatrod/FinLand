@@ -654,19 +654,19 @@ export default function CreditCardCalculator() {
 
             {/* 🧠 AI Financial Advisor - Essential Insights */}
             {aiAnalysis && (
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-6 rounded-xl shadow-lg border-2 border-indigo-200 dark:border-indigo-700 animate-fade-in">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-indigo-200 dark:border-indigo-700 animate-fade-in">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl shadow-lg">
-                      <Sparkles className="w-6 h-6 text-white" />
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-5">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg sm:rounded-xl shadow-lg">
+                      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
+                      <h3 className="font-bold text-base sm:text-lg text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Financial Advisor v{aiAnalysis.version}</p>
                     </div>
                   </div>
-                  <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                  <div className={`self-start sm:self-auto px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold ${
                     aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
                     aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
                     'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
@@ -676,9 +676,9 @@ export default function CreditCardCalculator() {
                 </div>
 
                 {/* Health Score - Main Focus */}
-                <div className="bg-white/80 dark:bg-gray-800/80 p-4 rounded-xl mb-4 text-center">
-                  <div className="text-4xl mb-2">❤️</div>
-                  <div className={`text-4xl font-bold mb-1 ${
+                <div className="bg-white/80 dark:bg-gray-800/80 p-3 sm:p-4 rounded-xl mb-3 sm:mb-4 text-center">
+                  <div className="text-3xl sm:text-4xl mb-1 sm:mb-2">❤️</div>
+                  <div className={`text-3xl sm:text-4xl font-bold mb-1 ${
                     aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
                     aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
                     'text-red-600 dark:text-red-400'
@@ -696,42 +696,42 @@ export default function CreditCardCalculator() {
                 </div>
 
                 {/* Debt Analysis - Key Numbers */}
-                <div className="bg-white/60 dark:bg-gray-800/60 p-4 rounded-xl mb-4">
-                  <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">📊 สรุปการชำระหนี้</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-                      <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{aiAnalysis.debt_analysis?.debt_freedom_months}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">เดือนที่จะปลดหนี้</div>
+                <div className="bg-white/60 dark:bg-gray-800/60 p-3 sm:p-4 rounded-xl mb-3 sm:mb-4">
+                  <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">📊 สรุปการชำระหนี้</h4>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                    <div className="text-center p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                      <div className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">{aiAnalysis.debt_analysis?.debt_freedom_months}</div>
+                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">เดือนที่จะปลดหนี้</div>
                     </div>
-                    <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
-                      <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{formatCurrency(aiAnalysis.debt_analysis?.smart_payment_boost)}</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">แนะนำจ่ายเพิ่ม/เดือน</div>
+                    <div className="text-center p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+                      <div className="text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{formatCurrency(aiAnalysis.debt_analysis?.smart_payment_boost)}</div>
+                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">แนะนำจ่ายเพิ่ม/เดือน</div>
                     </div>
                   </div>
                   {aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
-                    <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
-                      <div className="text-sm text-amber-800 dark:text-amber-200">
-                        💡 ถ้าจ่ายเพิ่ม จะ<span className="font-bold">ปลดหนี้เร็วขึ้น {aiAnalysis.debt_analysis?.time_saved_months} เดือน</span> และ<span className="font-bold">ประหยัดดอกเบี้ย {formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)} บาท</span>
+                    <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                      <div className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
+                        💡 ถ้าจ่ายเพิ่ม จะ<span className="font-bold">เร็วขึ้น {aiAnalysis.debt_analysis?.time_saved_months} เดือน</span> <span className="font-bold">ประหยัด {formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)} บาท</span>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Strategy & Action */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                  <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">🎯 กลยุทธ์แนะนำ</div>
-                    <div className="font-bold text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 p-3 sm:p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">🎯 กลยุทธ์แนะนำ</div>
+                    <div className="font-bold text-sm sm:text-base text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
                   </div>
-                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 p-4 rounded-xl border border-amber-200 dark:border-amber-700">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">⭐ สิ่งที่ควรทำก่อน</div>
-                    <div className="font-bold text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
+                  <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-500/20 dark:to-orange-500/20 p-3 sm:p-4 rounded-xl border border-amber-200 dark:border-amber-700">
+                    <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">⭐ สิ่งที่ควรทำก่อน</div>
+                    <div className="font-bold text-sm sm:text-base text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
                   </div>
                 </div>
 
                 {/* Emergency Fund Recommendation */}
                 {aiAnalysis.planning?.emergency_buffer_months > 0 && (
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-200 dark:border-blue-700 text-sm">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-2 sm:p-3 rounded-lg border border-blue-200 dark:border-blue-700 text-xs sm:text-sm">
                     <span className="text-blue-800 dark:text-blue-200">🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <span className="font-bold">{aiAnalysis.planning?.emergency_buffer_months} เดือน</span></span>
                   </div>
                 )}
