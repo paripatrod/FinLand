@@ -420,78 +420,7 @@ export default function CreditCardCalculator() {
                 </div>
             </div>
 
-            {/* AI Profile Analysis */}
-            {aiLoading && (
-              <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900/20 to-indigo-50 dark:to-indigo-900/20 p-6 rounded-xl shadow-md border-2 border-purple-200 dark:border-purple-700 animate-pulse">
-                <div className="flex items-center space-x-3">
-                  <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 animate-spin" />
-                  <p className="text-purple-700 dark:text-purple-300 font-semibold">{t('ai.analyzing')}</p>
-                </div>
-              </div>
-            )}
-
-            {aiProfile && (
-              <div className={`p-6 rounded-xl shadow-lg border-2 animate-fade-in ${getSeverityConfig(aiProfile.severity).bg} ${getSeverityConfig(aiProfile.severity).border}`}>
-                <div className="flex items-center space-x-2 mb-4">
-                  <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{t('ai.profileTitle')}</h3>
-                </div>
-
-                <div className={`flex items-start space-x-3 ${getSeverityConfig(aiProfile.severity).text} mb-4`}>
-                  {getSeverityConfig(aiProfile.severity).icon}
-                  <div className="flex-1">
-                    <div className="font-bold text-lg mb-2">{aiProfile.name}</div>
-                    <div className="text-sm mb-3 leading-relaxed">{aiProfile.tip}</div>
-                    
-                    {/* Risk Score Progress Bar */}
-                    {aiProfile.risk_score !== undefined && (
-                      <div className="mb-3">
-                        <div className="flex justify-between text-xs font-semibold mb-1">
-                          <span>{t('ai.riskLevel')}</span>
-                          <span>{aiProfile.risk_score}/100</span>
-                        </div>
-                        <div className="w-full bg-white/70 dark:bg-gray-700/70 rounded-full h-3 overflow-hidden border border-gray-200 dark:border-gray-600">
-                          <div 
-                            className={`h-full transition-all duration-1000 ${
-                              aiProfile.risk_score < 30 ? 'bg-emerald-500' :
-                              aiProfile.risk_score < 50 ? 'bg-yellow-500' :
-                              aiProfile.risk_score < 70 ? 'bg-orange-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${aiProfile.risk_score}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Action Recommendation */}
-                    {aiProfile.action && (
-                      <div className="mb-3 p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border-2 border-white/50 dark:border-gray-700/50 shadow-sm">
-                        <p className="text-sm font-bold mb-1 dark:text-gray-200">{t('ai.recommendation')}</p>
-                        <p className="text-sm dark:text-gray-300">{aiProfile.action}</p>
-                      </div>
-                    )}
-
-                    {/* Badges Row */}
-                    <div className="flex flex-wrap gap-2 items-center">
-                      <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
-                        {getSeverityConfig(aiProfile.severity).label}
-                      </div>
-                      
-                      {/* Confidence Score (only for Enterprise AI v2) */}
-                      {aiProfile.confidence !== undefined && (
-                        <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
-                          {t('ai.accuracy')} {aiProfile.confidence.toFixed(1)}%
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Chart Section - Pie Chart Only */}
+            {/* Chart Section - Pie Chart Only (moved before AI for mobile) */}
             <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                 <div>
@@ -564,6 +493,77 @@ export default function CreditCardCalculator() {
                 </div>
               </div>
             </div>
+
+            {/* AI Profile Analysis */}
+            {aiLoading && (
+              <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900/20 to-indigo-50 dark:to-indigo-900/20 p-6 rounded-xl shadow-md border-2 border-purple-200 dark:border-purple-700 animate-pulse">
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 animate-spin" />
+                  <p className="text-purple-700 dark:text-purple-300 font-semibold">{t('ai.analyzing')}</p>
+                </div>
+              </div>
+            )}
+
+            {aiProfile && (
+              <div className={`p-6 rounded-xl shadow-lg border-2 animate-fade-in ${getSeverityConfig(aiProfile.severity).bg} ${getSeverityConfig(aiProfile.severity).border}`}>
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{t('ai.profileTitle')}</h3>
+                </div>
+
+                <div className={`flex items-start space-x-3 ${getSeverityConfig(aiProfile.severity).text} mb-4`}>
+                  {getSeverityConfig(aiProfile.severity).icon}
+                  <div className="flex-1">
+                    <div className="font-bold text-lg mb-2">{aiProfile.name}</div>
+                    <div className="text-sm mb-3 leading-relaxed">{aiProfile.tip}</div>
+                    
+                    {/* Risk Score Progress Bar */}
+                    {aiProfile.risk_score !== undefined && (
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs font-semibold mb-1">
+                          <span>{t('ai.riskLevel')}</span>
+                          <span>{aiProfile.risk_score}/100</span>
+                        </div>
+                        <div className="w-full bg-white/70 dark:bg-gray-700/70 rounded-full h-3 overflow-hidden border border-gray-200 dark:border-gray-600">
+                          <div 
+                            className={`h-full transition-all duration-1000 ${
+                              aiProfile.risk_score < 30 ? 'bg-emerald-500' :
+                              aiProfile.risk_score < 50 ? 'bg-yellow-500' :
+                              aiProfile.risk_score < 70 ? 'bg-orange-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${aiProfile.risk_score}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Recommendation */}
+                    {aiProfile.action && (
+                      <div className="mb-3 p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border-2 border-white/50 dark:border-gray-700/50 shadow-sm">
+                        <p className="text-sm font-bold mb-1 dark:text-gray-200">{t('ai.recommendation')}</p>
+                        <p className="text-sm dark:text-gray-300">{aiProfile.action}</p>
+                      </div>
+                    )}
+
+                    {/* Badges Row */}
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
+                        {getSeverityConfig(aiProfile.severity).label}
+                      </div>
+                      
+                      {/* Confidence Score (only for Enterprise AI v2) */}
+                      {aiProfile.confidence !== undefined && (
+                        <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
+                          {t('ai.accuracy')} {aiProfile.confidence.toFixed(1)}%
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Table Section */}
             <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
