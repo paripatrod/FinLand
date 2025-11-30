@@ -273,13 +273,13 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
     `จะปิดหนี้ได้เมื่อไหร่?`,
     `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`,
     `มีวิธีลดหนี้เร็วขึ้นไหม?`,
-    `ควรรีไฟแนนซ์ไหม?`
+    `ควรเพิ่มยอดจ่ายอีกเท่าไหร่?`
   ] : [
     `How much should I pay?`,
     `When will I be debt free?`,
     `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`,
     `How can I pay off faster?`,
-    `Should I refinance?`
+    `How much extra should I pay?`
   ];
 
   const handleClearChat = () => {
