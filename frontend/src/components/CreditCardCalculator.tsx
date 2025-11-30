@@ -695,20 +695,45 @@ export default function CreditCardCalculator() {
                   </div>
                 </div>
 
-                {/* Debt Analysis - Key Numbers */}
+                {/* Debt Analysis - Key Numbers (Synced with What-If) */}
                 <div className="bg-white/60 dark:bg-gray-800/60 p-3 sm:p-4 rounded-xl mb-3 sm:mb-4">
-                  <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">📊 สรุปการชำระหนี้</h4>
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">📊 สรุปการชำระหนี้</h4>
+                    {extraPayment > 0 && (
+                      <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-[10px] sm:text-xs font-bold rounded-full animate-pulse">
+                        🎯 What-If Mode
+                      </span>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                    <div className="text-center p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-                      <div className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">{aiAnalysis.debt_analysis?.debt_freedom_months}</div>
+                    <div className="text-center p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
+                      <div className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        {extraPayment > 0 && whatIfResult ? whatIfResult.months : aiAnalysis.debt_analysis?.debt_freedom_months}
+                      </div>
                       <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">เดือนที่จะปลดหนี้</div>
+                      {extraPayment > 0 && whatIfResult && whatIfResult.savedMonths > 0 && (
+                        <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full">
+                          -{whatIfResult.savedMonths}
+                        </div>
+                      )}
                     </div>
                     <div className="text-center p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
-                      <div className="text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{formatCurrency(aiAnalysis.debt_analysis?.smart_payment_boost)}</div>
-                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">แนะนำจ่ายเพิ่ม/เดือน</div>
+                      <div className="text-lg sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        +{formatCurrency(extraPayment > 0 ? extraPayment : aiAnalysis.debt_analysis?.smart_payment_boost)}
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+                        {extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม/เดือน'}
+                      </div>
                     </div>
                   </div>
-                  {aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
+                  {/* Show What-If Results or AI Recommendation */}
+                  {extraPayment > 0 && whatIfResult ? (
+                    <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-lg border border-emerald-300 dark:border-emerald-600">
+                      <div className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-200">
+                        🎯 <span className="font-bold">ผลการคำนวณ What-If:</span> เร็วขึ้น <span className="font-bold text-emerald-600 dark:text-emerald-400">{whatIfResult.savedMonths} เดือน</span>, ประหยัด <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(whatIfResult.savedInterest)} บาท</span>
+                      </div>
+                    </div>
+                  ) : aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
                     <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
                       <div className="text-xs sm:text-sm text-amber-800 dark:text-amber-200">
                         💡 ถ้าจ่ายเพิ่ม จะ<span className="font-bold">เร็วขึ้น {aiAnalysis.debt_analysis?.time_saved_months} เดือน</span> <span className="font-bold">ประหยัด {formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)} บาท</span>
