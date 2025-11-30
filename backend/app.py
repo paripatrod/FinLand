@@ -232,20 +232,70 @@ def get_model():
     
     model_loading_attempted = True
     
+    # Check for model files - support both old and new naming
+    model_file = None
+    if os.path.exists('financial_advisor_model.pkl'):
+        model_file = 'financial_advisor_model.pkl'
+    elif os.path.exists('model.pkl'):
+        model_file = 'model.pkl'
+    
     # Try to download model if not exists locally
-    if not os.path.exists('model.pkl'):
+    if not model_file:
         print("📦 Model not found locally, checking for remote URL...")
-        if not download_model_from_url():
+        if download_model_from_url():
+            # Check again after download
+            if os.path.exists('financial_advisor_model.pkl'):
+                model_file = 'financial_advisor_model.pkl'
+            elif os.path.exists('model.pkl'):
+                model_file = 'model.pkl'
+        
+        if not model_file:
             print("⚠️ AI model not available. To enable AI: Set MODEL_URL environment variable or provide model.pkl file.")
             return None
     
     try:
-        print("📦 Loading AI Model...")
-        model_data = joblib.load('model.pkl')
+        print(f"📦 Loading AI Model from {model_file}...")
+        model_data = joblib.load(model_file)
         
-        # Handle both old format (EnterpriseProfilePredictor) and new format (dict)
+        # Handle Financial Advisor v3.0 format
+        if isinstance(model_data, dict) and 'regression_model' in model_data:
+            # This is Financial Advisor v3.0 - use it for legacy /api/predict too
+            print(f"✅ Financial Advisor v3.0 loaded! ({model_data.get('training_samples', 0):,} samples)")
+            # Create a simple wrapper that returns profile_id based on health score
+            class LegacyModelWrapper:
+                def __init__(self, advisor_data):
+                    self.advisor = advisor_data
+                    self.version = advisor_data.get('version', '3.0.0')
+                
+                def predict(self, X):
+                    # For legacy compatibility, return profile based on loan characteristics
+                    import numpy as np
+                    results = []
+                    for row in X:
+                        loan, rate, term = row[0], row[1], row[2]
+                        # Simple profile mapping based on interest rate
+                        if rate <= 2:
+                            profile = 1  # กยศ.
+                        elif rate <= 8:
+                            profile = 20  # Personal low
+                        elif rate <= 15:
+                            profile = 40  # Personal high
+                        elif rate <= 20:
+                            profile = 60  # Credit card
+                        else:
+                            profile = 80  # High risk
+                        results.append(profile)
+                    return np.array(results)
+                
+                def predict_proba(self, X):
+                    return None
+            
+            model = LegacyModelWrapper(model_data)
+            return model
+        
+        # Handle old format (EnterpriseProfilePredictor) and dict format
         if isinstance(model_data, dict):
-            # New format: wrap in EnterpriseProfilePredictor
+            # Old dict format: wrap in EnterpriseProfilePredictor
             model = EnterpriseProfilePredictor(
                 model_data['model'],
                 model_data['scaler'],
@@ -805,11 +855,11 @@ def health():
         "gemini_enabled": bool(os.environ.get('GEMINI_API_KEY'))
     })
 
-# API: AI Chat with Gemini
+# API: AI Chat with Gemini (Enhanced with Financial Advisor v3.0)
 @app.route('/api/ai-chat', methods=['POST'])
 @limiter.limit("20 per minute")
 def ai_chat():
-    """AI Chat using Google Gemini for financial advice"""
+    """AI Chat using Google Gemini + Financial Advisor v3.0 for comprehensive advice"""
     try:
         gemini_key = os.environ.get('GEMINI_API_KEY')
         
@@ -833,7 +883,7 @@ def ai_chat():
         import google.generativeai as genai
         genai.configure(api_key=gemini_key)
         
-        # Calculate some useful metrics
+        # Calculate basic metrics
         monthly_rate = apr / 100 / 12
         monthly_interest = balance * monthly_rate
         dti_ratio = (payment / monthly_income * 100) if monthly_income > 0 else 0
@@ -848,7 +898,77 @@ def ai_chat():
                 temp_balance -= principal
                 months_to_payoff += 1
         else:
-            months_to_payoff = -1  # Cannot pay off
+            months_to_payoff = -1
+        
+        # 🧠 Get AI Analysis from Financial Advisor v3.0
+        ai_insights = ""
+        advisor = get_financial_advisor()
+        if advisor and monthly_income > 0:
+            try:
+                import numpy as np
+                
+                # Build features
+                term_months = months_to_payoff if months_to_payoff > 0 else 60
+                monthly_expenses = monthly_income * 0.5
+                effective_rate = ((1 + apr/100/12)**12 - 1) * 100
+                
+                features = np.array([[
+                    balance, apr, term_months, monthly_income, payment,
+                    dti_ratio, payment, monthly_expenses, 0, 30,
+                    70, 80, 36, 0,
+                    effective_rate, np.log1p(balance), np.log1p(monthly_income),
+                    monthly_income - payment - monthly_expenses,
+                    balance/(monthly_income*12) if monthly_income > 0 else 10,
+                    1.0, ((monthly_income - payment - monthly_expenses)/monthly_income*100) if monthly_income > 0 else 0,
+                    30,
+                    1 if apr <= 2 else 0, 1 if 4 <= apr < 15 else 0,
+                    1 if 15 <= apr < 20 else 0, 1 if apr >= 20 else 0,
+                    1, 0, 0, 1 if monthly_income >= 50000 else 0
+                ]])
+                
+                # Get predictions
+                scaler = advisor['scaler']
+                features_scaled = scaler.transform(features)
+                reg_pred = advisor['regression_model'].predict(features_scaled)[0]
+                strategy_code = advisor['strategy_model'].predict(features_scaled)[0]
+                action_code = advisor['action_model'].predict(features_scaled)[0]
+                urgency_level = advisor['urgency_model'].predict(features_scaled)[0]
+                
+                # Build AI insights
+                health_score = round(min(100, max(0, reg_pred[5])), 0)
+                stress_index = round(min(100, max(0, reg_pred[6])), 0)
+                stability = round(min(100, max(0, reg_pred[7])), 0)
+                wealth_potential = round(min(100, max(0, reg_pred[8])), 0)
+                investment_ready = round(min(100, max(0, reg_pred[11])), 0)
+                life_quality = round(min(100, max(0, reg_pred[15])), 0)
+                smart_boost = round(max(0, reg_pred[1]), 0)
+                time_saved = round(max(0, reg_pred[2]), 0)
+                money_saved = round(max(0, reg_pred[3]), 0)
+                
+                strategy_labels = advisor['strategy_labels']
+                action_labels = advisor['action_labels']
+                urgency_labels = advisor['urgency_labels']
+                
+                ai_insights = f"""
+🧠 ผลวิเคราะห์จาก AI Financial Advisor v3.0:
+- คะแนนสุขภาพการเงิน: {health_score}/100
+- ดัชนีความเครียดจากหนี้: {stress_index}/100 {"🚨 สูงมาก!" if stress_index > 60 else "⚠️ ค่อนข้างสูง" if stress_index > 40 else "✅ อยู่ในเกณฑ์ดี"}
+- ความมั่นคงทางการเงิน: {stability}/100
+- ศักยภาพสร้างความมั่งคั่ง: {wealth_potential}/100
+- ความพร้อมลงทุน: {investment_ready}/100
+- คุณภาพชีวิต: {life_quality}/100
+
+💡 คำแนะนำจาก AI:
+- กลยุทธ์ปิดหนี้: {strategy_labels.get(int(strategy_code), "Standard")}
+- สิ่งที่ควรทำก่อน: {action_labels.get(int(action_code), "รักษาระดับ")}
+- ระดับความเร่งด่วน: {urgency_labels.get(int(urgency_level), "ปกติ")}
+
+📊 ถ้าจ่ายเพิ่มอีก {smart_boost:,} บาท/เดือน:
+- ปิดหนี้เร็วขึ้น {time_saved} เดือน
+- ประหยัดดอกเบี้ย {money_saved:,} บาท"""
+            except Exception as e:
+                print(f"⚠️ Financial Advisor analysis failed: {e}")
+                ai_insights = ""
         
         prompt = f"""คุณเป็นที่ปรึกษาการเงินส่วนบุคคลที่เชี่ยวชาญเรื่องหนี้บัตรเครดิตและการวางแผนการเงิน
 ชื่อของคุณคือ "AI ที่ปรึกษาหนี้ FinLand"
@@ -861,6 +981,7 @@ def ai_chat():
 - รายได้ต่อเดือน: {monthly_income:,.0f} บาท
 - DTI Ratio: {dti_ratio:.1f}%
 - คาดว่าปิดหนี้ได้ใน: {"ไม่สามารถปิดได้ (จ่ายน้อยกว่าดอกเบี้ย)" if months_to_payoff < 0 else f"{months_to_payoff} เดือน ({months_to_payoff // 12} ปี {months_to_payoff % 12} เดือน)"}
+{ai_insights}
 
 💬 คำถามของผู้ใช้: {question}
 
@@ -868,10 +989,11 @@ def ai_chat():
 1. ตอบเป็นภาษาไทยเท่านั้น
 2. **ห้ามแนะนำตัว** (เช่น "สวัสดีครับ ผมคือ...") ยกเว้นผู้ใช้ถามว่าคุณคือใคร
 3. ใช้ **Markdown** จัดรูปแบบให้อ่านง่าย (ใช้ตัวหนา, รายการแบบจุด, ย่อหน้าสั้นๆ)
-4. ตอบกระชับ ตรงประเด็น ไม่เกิน 200 คำ
+4. ตอบกระชับ ตรงประเด็น ไม่เกิน 250 คำ
 5. ใช้ emoji ประกอบหัวข้อให้น่าอ่าน
-6. ถ้าสถานการณ์อันตราย (DTI > 40% หรือจ่ายไม่พอดอกเบี้ย) ให้เตือนด้วย 🚨
-7. อย่าให้คำแนะนำทางกฎหมายหรือการลงทุนที่ซับซ้อน"""
+6. ถ้าสถานการณ์อันตราย (DTI > 40% หรือจ่ายไม่พอดอกเบี้ย หรือ stress > 60) ให้เตือนด้วย 🚨
+7. อ้างอิงข้อมูลจาก AI Financial Advisor ถ้ามี
+8. อย่าให้คำแนะนำทางกฎหมายหรือการลงทุนที่ซับซ้อน"""
 
         # Try multiple models in order of preference
         models_to_try = [
