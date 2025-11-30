@@ -131,7 +131,8 @@ export default function CreditCardCalculator() {
     }
   }
 
-  function formatCurrency(v: number) {
+  function formatCurrency(v: number | undefined | null) {
+    if (v === undefined || v === null || isNaN(v)) return '0.00'
     return v.toLocaleString('th-TH', { minimumFractionDigits: 2 })
   }
 
