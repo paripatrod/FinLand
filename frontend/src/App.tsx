@@ -55,9 +55,9 @@ function App() {
               </Suspense>
             </AnimatePresence>
           </Layout>
+          <OfflineIndicator />
         </LanguageProvider>
       </ThemeProvider>
-      <OfflineIndicator />
       <Analytics />
     </ErrorBoundary>
   );
