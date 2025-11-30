@@ -61,12 +61,12 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com blob:;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: blob:;
-      connect-src 'self' https://finland-ilb5.onrender.com https://generativelanguage.googleapis.com https://vercel.live wss://ws-us3.pusher.com;
-      frame-ancestors 'none';
+      connect-src 'self' https://finland-ilb5.onrender.com https://generativelanguage.googleapis.com https://vercel.live https://vitals.vercel-insights.com wss://ws-us3.pusher.com;
+      worker-src 'self' blob:;
       base-uri 'self';
       form-action 'self';
     " />
