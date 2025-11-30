@@ -103,16 +103,16 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
       };
       
       return {
-        answer: `📊 เปรียบเทียบการจ่าย\n\n` +
-          `💳 จ่าย ${payment1.toLocaleString()} บาท:\n` +
-          `  ⏱️ ${scenario1.months} เดือน (${Math.floor(scenario1.months/12)} ปี)\n` +
-          `  💸 ดอกเบี้ย ${scenario1.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n\n` +
-          `💳 จ่าย ${payment2.toLocaleString()} บาท:\n` +
-          `  ⏱️ ${scenario2.months} เดือน (${Math.floor(scenario2.months/12)} ปี)\n` +
-          `  💸 ดอกเบี้ย ${scenario2.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n\n` +
-          `🎉 ถ้าจ่าย ${payment2.toLocaleString()} บาท:\n` +
-          `  ✅ เร็วขึ้น ${comparison.savings.months} เดือน\n` +
-          `  ✅ ประหยัด ${comparison.savings.interest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท`,
+        answer: `## 📊 เปรียบเทียบการจ่าย\n\n` +
+          `| รายการ | 💳 ${payment1.toLocaleString()} บาท | 💳 ${payment2.toLocaleString()} บาท |\n` +
+          `|:---|:---:|:---:|\n` +
+          `| ⏱️ ระยะเวลา | ${scenario1.months} เดือน | ${scenario2.months} เดือน |\n` +
+          `| 📅 คิดเป็น | ${Math.floor(scenario1.months/12)} ปี ${scenario1.months % 12} ด. | ${Math.floor(scenario2.months/12)} ปี ${scenario2.months % 12} ด. |\n` +
+          `| 💸 ดอกเบี้ยรวม | ${scenario1.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} | ${scenario2.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} |\n` +
+          `| 💰 จ่ายทั้งหมด | ${scenario1.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} | ${scenario2.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} |\n\n` +
+          `### 🎉 ถ้าเพิ่มเป็น ${payment2.toLocaleString()} บาท\n` +
+          `- ✅ **เร็วขึ้น ${comparison.savings.months} เดือน**\n` +
+          `- ✅ **ประหยัด ${comparison.savings.interest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท**`,
         comparison
       };
     }
@@ -132,14 +132,13 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
       const getInterest = (s: any) => 'totalInterest' in s ? s.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0}) : '-';
       
       return {
-        answer: `💡 คำแนะนำการจ่าย\n\n` +
-          `⚠️ ขั้นต่ำ: ${minPayment.toLocaleString()} บาท\n` +
-          `  → ${getMonths(minScenario)} เดือน | ดอกเบี้ย ${getInterest(minScenario)}\n\n` +
-          `👍 แนะนำ: ${recommended.toLocaleString()} บาท\n` +
-          `  → ${getMonths(recScenario)} เดือน | ดอกเบี้ย ${getInterest(recScenario)}\n\n` +
-          `🏆 ดีที่สุด: ${ideal.toLocaleString()} บาท\n` +
-          `  → ${getMonths(idealScenario)} เดือน | ดอกเบี้ย ${getInterest(idealScenario)}\n\n` +
-          `🎯 สรุป: ถ้าทำได้ ให้จ่าย ${ideal.toLocaleString()} บาท จะประหยัดที่สุด!`
+        answer: `## 💡 คำแนะนำการจ่าย\n\n` +
+          `| ระดับ | ยอดจ่าย/เดือน | ระยะเวลา | ดอกเบี้ยรวม |\n` +
+          `|:---|:---:|:---:|:---:|\n` +
+          `| ⚠️ ขั้นต่ำ | ${minPayment.toLocaleString()} | ${getMonths(minScenario)} เดือน | ${getInterest(minScenario)} |\n` +
+          `| 👍 แนะนำ | ${recommended.toLocaleString()} | ${getMonths(recScenario)} เดือน | ${getInterest(recScenario)} |\n` +
+          `| 🏆 ดีที่สุด | ${ideal.toLocaleString()} | ${getMonths(idealScenario)} เดือน | ${getInterest(idealScenario)} |\n\n` +
+          `> 🎯 **สรุป:** ถ้าทำได้ ให้จ่าย **${ideal.toLocaleString()} บาท** จะประหยัดที่สุด!`
       };
     }
     
@@ -415,6 +414,20 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
                                   blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-purple-300 pl-3 italic my-2" {...props} />,
                                   // @ts-ignore
                                   code: ({node, ...props}) => <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded text-xs font-mono" {...props} />,
+                                  // @ts-ignore
+                                  table: ({node, ...props}) => <table className="w-full text-xs border-collapse my-2" {...props} />,
+                                  // @ts-ignore
+                                  thead: ({node, ...props}) => <thead className="bg-purple-100 dark:bg-purple-900/50" {...props} />,
+                                  // @ts-ignore
+                                  th: ({node, ...props}) => <th className="border border-purple-200 dark:border-purple-700 px-2 py-1.5 text-left font-semibold text-purple-800 dark:text-purple-200" {...props} />,
+                                  // @ts-ignore
+                                  td: ({node, ...props}) => <td className="border border-gray-200 dark:border-gray-600 px-2 py-1.5" {...props} />,
+                                  // @ts-ignore
+                                  tr: ({node, ...props}) => <tr className="even:bg-gray-50 dark:even:bg-gray-800/50" {...props} />,
+                                  // @ts-ignore
+                                  h2: ({node, ...props}) => <h2 className="text-base font-bold mb-2 text-purple-700 dark:text-purple-300" {...props} />,
+                                  // @ts-ignore
+                                  h3: ({node, ...props}) => <h3 className="text-sm font-bold mt-3 mb-1 text-gray-700 dark:text-gray-300" {...props} />,
                                 }}
                               >
                                 {msg.content}
