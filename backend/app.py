@@ -18,6 +18,7 @@ app = Flask(__name__)
 ALLOWED_ORIGINS = [
     "https://financial-calculator-thailand.vercel.app",
     "https://fin-land.vercel.app",
+    "https://finland.vercel.app",
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
