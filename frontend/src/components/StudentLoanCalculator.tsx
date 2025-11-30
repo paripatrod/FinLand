@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Download, Save, Sparkles, AlertCircle, TrendingDown, TrendingUp, Calculator, Printer } from 'lucide-react'
+import { Download, Save, Sparkles, AlertCircle, Calculator, Printer } from 'lucide-react'
 import { saveCalculation, saveToHistory } from '../utils/storage'
 import { useLanguage } from '../contexts/LanguageContext'
 import { apiClient } from '../utils/api'
@@ -56,6 +56,13 @@ export default function StudentLoanCalculator() {
     setError(null)
     setResult(null)
     setSaved(false)
+    
+    // Validate monthly income
+    if (!monthlyIncome || Number(monthlyIncome) <= 0) {
+      setError('กรุณาระบุรายได้ต่อเดือน เพื่อให้ AI วิเคราะห์ได้แม่นยำ')
+      return
+    }
+    
     setLoading(true)
 
     const payload = { loan_amount: Number(principal), interest_rate: Number(apr), term_months: Math.max(1, Math.round(Number(years) * 12)) }
@@ -132,21 +139,6 @@ export default function StudentLoanCalculator() {
   function formatCurrency(v: number | undefined | null) {
     if (v === undefined || v === null || isNaN(v)) return '0.00'
     return v.toLocaleString('th-TH', { minimumFractionDigits: 2 })
-  }
-
-  function getSeverityConfig(severity?: string) {
-    switch (severity) {
-      case 'low':
-        return { color: 'emerald', icon: <TrendingDown className="w-5 h-5" />, label: t('severity.low'), bg: 'bg-emerald-50 dark:bg-emerald-900/20', border: 'border-emerald-300 dark:border-emerald-700', text: 'text-emerald-700 dark:text-emerald-300' }
-      case 'medium':
-        return { color: 'yellow', icon: <AlertCircle className="w-5 h-5" />, label: t('severity.medium'), bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-300 dark:border-yellow-700', text: 'text-yellow-700 dark:text-yellow-300' }
-      case 'high':
-        return { color: 'orange', icon: <TrendingUp className="w-5 h-5" />, label: t('severity.high'), bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-300 dark:border-orange-700', text: 'text-orange-700 dark:text-orange-300' }
-      case 'critical':
-        return { color: 'red', icon: <AlertCircle className="w-5 h-5" />, label: `⚠️ ${t('severity.critical')}`, bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-300 dark:border-red-700', text: 'text-red-700 dark:text-red-300' }
-      default:
-        return { color: 'gray', icon: <AlertCircle className="w-5 h-5" />, label: t('severity.unknown'), bg: 'bg-gray-50 dark:bg-gray-900/20', border: 'border-gray-300 dark:border-gray-700', text: 'text-gray-700 dark:text-gray-300' }
-    }
   }
 
   function downloadCSV() {
