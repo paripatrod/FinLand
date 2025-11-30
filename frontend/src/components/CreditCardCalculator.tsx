@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Download, Save, Sparkles, AlertCircle, TrendingDown, TrendingUp, Calculator, Printer } from 'lucide-react'
 import { saveCalculation, saveToHistory } from '../utils/storage'
 import { useLanguage } from '../contexts/LanguageContext'
@@ -375,7 +375,7 @@ export default function CreditCardCalculator() {
                     <input 
                       type="range" 
                       min="0" 
-                      max={Number(monthlyPayment)} 
+                      max={Number(monthlyIncome) || Number(monthlyPayment) * 2} 
                       step="100" 
                       value={extraPayment} 
                       onChange={(e) => setExtraPayment(Number(e.target.value))}
@@ -383,7 +383,7 @@ export default function CreditCardCalculator() {
                     />
                     <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                       <span>0</span>
-                      <span>{formatCurrency(Number(monthlyPayment))}</span>
+                      <span>{formatCurrency(Number(monthlyIncome) || Number(monthlyPayment) * 2)}</span>
                     </div>
                   </div>
 
@@ -491,82 +491,48 @@ export default function CreditCardCalculator() {
               </div>
             )}
 
-            {/* Chart Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">{t('chart.title')}</h3>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={downloadCSV} 
-                      className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 dark:bg-emerald-700 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-800 shadow-sm hover:shadow-md transition-all"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>CSV</span>
-                    </button>
-                    <button 
-                      onClick={() => printPaymentSchedule('credit-card', 
-                        { balance: Number(balance), apr: Number(apr), monthly_payment: Number(monthlyPayment) },
-                        result
-                      )} 
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow-md transition-all"
-                    >
-                      <Printer className="w-4 h-4" />
-                      <span>PDF</span>
-                    </button>
-                  </div>
+            {/* Chart Section - Pie Chart Only */}
+            <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">{t('chart.pieTitle')}</h3>
+                  {whatIfResult && (
+                    <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">✨ {t('whatif.title')}</p>
+                  )}
                 </div>
-                
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={result.schedule}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis 
-                      dataKey="month" 
-                      label={{ value: t('table.month'), position: 'insideBottom', offset: -5 }}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis 
-                      label={{ value: t('common.currency'), angle: -90, position: 'insideLeft' }}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      formatter={(value: number) => formatCurrency(value) + ` ${t('common.currency')}`}
-                      contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                    />
-                    <Legend wrapperStyle={{ fontSize: '14px' }} />
-                    <Line 
-                      type="monotone" 
-                      dataKey="remaining" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      name={t('table.remaining')} 
-                      dot={{ r: 2 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="interest" 
-                      stroke="#ef4444" 
-                      strokeWidth={2}
-                      name={t('table.interest')}
-                      dot={{ r: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={downloadCSV} 
+                    className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 dark:bg-emerald-700 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 dark:hover:bg-emerald-800 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>CSV</span>
+                  </button>
+                  <button 
+                    onClick={() => printPaymentSchedule('credit-card', 
+                      { balance: Number(balance), apr: Number(apr), monthly_payment: Number(monthlyPayment) },
+                      result
+                    )} 
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-700 dark:hover:bg-blue-800 shadow-sm hover:shadow-md transition-all"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>PDF</span>
+                  </button>
+                </div>
               </div>
-
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 w-full text-left">{t('chart.pieTitle')}</h3>
-                <ResponsiveContainer width="100%" height={300}>
+              
+              <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
+                <ResponsiveContainer width="100%" height={300} className="max-w-md">
                   <PieChart>
                     <Pie
                       data={[
                         { name: t('table.principal'), value: Number(balance) },
-                        { name: t('table.interest'), value: result.total_interest }
+                        { name: t('table.interest'), value: whatIfResult ? whatIfResult.totalInterest : result.total_interest }
                       ]}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
+                      innerRadius={70}
+                      outerRadius={100}
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -577,6 +543,25 @@ export default function CreditCardCalculator() {
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
+                
+                {/* Summary beside pie chart */}
+                <div className="flex flex-col gap-4 min-w-[200px]">
+                  <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-700">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t('table.principal')}</div>
+                    <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(Number(balance))} {t('common.currency')}</div>
+                  </div>
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-700">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t('table.interest')}</div>
+                    <div className="text-xl font-bold text-red-600 dark:text-red-400">
+                      {formatCurrency(whatIfResult ? whatIfResult.totalInterest : result.total_interest)} {t('common.currency')}
+                    </div>
+                    {whatIfResult && (
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                        💰 {t('whatif.saveInterest')} {formatCurrency(whatIfResult.savedInterest)} {t('common.currency')}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
