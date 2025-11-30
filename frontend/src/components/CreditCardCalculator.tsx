@@ -68,12 +68,20 @@ export default function CreditCardCalculator() {
     const payload = { balance: Number(balance), apr: Number(apr), monthly_payment: Number(monthlyPayment) }
     try {
       const res = await apiClient.post('/api/calculate/credit-card', payload)
-      const data = await res.json()
-      if (!res.ok) {
+      
+      // Try to parse JSON, handle non-JSON responses
+      let data;
+      try {
+        data = await res.json()
+      } catch (jsonErr) {
+        // If response is not JSON (e.g., HTML error page)
+        const text = await res.text().catch(() => 'Unknown error')
+        throw new Error(`เซิร์ฟเวอร์ไม่ตอบสนอง กรุณาลองใหม่อีกครั้ง`)
+      }
+      
+      if (!res.ok || data.success === false) {
         // Build detailed error message
         let errorMsg = data.error || 'ไม่สามารถคำนวณได้'
-        if (data.message) errorMsg += '\n\n' + data.message
-        if (data.recommendation) errorMsg += '\n\n' + data.recommendation
         
         // Add details for payment_too_low error
         if (data.error_type === 'payment_too_low' && data.details) {
@@ -83,10 +91,16 @@ export default function CreditCardCalculator() {
             `💸 ดอกเบี้ยต่อเดือน: ${d.monthly_interest?.toLocaleString() || '?'} บาท\n` +
             `📈 หนี้จะเพิ่มขึ้น: ${d.shortfall?.toLocaleString() || '?'} บาท/เดือน\n\n` +
             `✅ แนะนำ: จ่ายอย่างน้อย ${d.minimum_payment?.toLocaleString() || '?'} บาท/เดือน`
+        } else if (data.message) {
+          errorMsg += '\n\n' + data.message
+          if (data.recommendation) errorMsg += '\n\n' + data.recommendation
         }
         
-        throw new Error(errorMsg)
+        setError(errorMsg)
+        setLoading(false)
+        return
       }
+      
       setResult(data)
       
       // Fire confetti
