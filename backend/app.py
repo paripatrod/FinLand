@@ -567,7 +567,17 @@ def ai_chat():
 7. ถ้าคำถามไม่เกี่ยวกับการเงิน ให้บอกว่าเชี่ยวชาญเรื่องหนี้และการเงินเท่านั้น"""
 
         # Try multiple models in order of preference
-        models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro', 'gemini-pro']
+        models_to_try = [
+            'gemini-2.0-flash', 
+            'gemini-2.0-flash-001',
+            'gemini-2.0-pro-exp',
+            'gemini-flash-latest',
+            'gemini-pro-latest',
+            'gemini-1.5-flash', 
+            'gemini-1.5-pro', 
+            'gemini-1.0-pro', 
+            'gemini-pro'
+        ]
         answer = None
         used_model = None
         last_error = None
