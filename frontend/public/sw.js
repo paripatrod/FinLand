@@ -17,7 +17,7 @@ const CACHEABLE_API_ROUTES = [
   '/api/health',
   '/api/calculate/credit-card',
   '/api/calculate/student-loan',
-  '/api/predict'
+  '/api/ai-analyze'
 ];
 
 // Cache strategies

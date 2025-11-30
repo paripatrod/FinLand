@@ -132,9 +132,8 @@ npm run dev
 |--------|----------|-------------|
 | `POST` | `/api/calculate/credit-card` | Credit card calculation |
 | `POST` | `/api/calculate/student-loan` | Student loan calculation |
-| `POST` | `/api/predict` | Legacy AI prediction |
-| `POST` | `/api/ai-analyze` | 🆕 AI Financial Advisor (21 predictions) |
-| `POST` | `/api/ai-chat` | 🆕 AI Chatbot with insights |
+| `POST` | `/api/ai-analyze` | 🧠 AI Financial Advisor v4.0 |
+| `POST` | `/api/ai-chat` | 💬 AI Chatbot with insights |
 | `GET` | `/api/health` | Health check with model status |
 
 ### AI Analyze Request
@@ -236,9 +235,8 @@ python train_financial_advisor.py
 ```
 FinLand/
 ├── 📂 backend/
-│   ├── app.py                         # Flask API + AI Advisor
-│   ├── profile_details.py             # Profile descriptions
-│   ├── train_financial_advisor.py     # 🆕 Model training (1M samples)
+│   ├── app.py                         # Flask API + AI Advisor v4.0
+│   ├── train_model.py                 # Model training (1M samples)
 │   ├── requirements.txt               # Python dependencies
 │   └── runtime.txt                    # Python version
 │
