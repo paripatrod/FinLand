@@ -74,6 +74,17 @@ export default function CreditCardCalculator() {
         let errorMsg = data.error || 'ไม่สามารถคำนวณได้'
         if (data.message) errorMsg += '\n\n' + data.message
         if (data.recommendation) errorMsg += '\n\n' + data.recommendation
+        
+        // Add details for payment_too_low error
+        if (data.error_type === 'payment_too_low' && data.details) {
+          const d = data.details
+          errorMsg = `⚠️ ยอดจ่ายต่ำเกินไป!\n\n` +
+            `💳 คุณจ่าย: ${d.monthly_payment?.toLocaleString() || monthlyPayment} บาท/เดือน\n` +
+            `💸 ดอกเบี้ยต่อเดือน: ${d.monthly_interest?.toLocaleString() || '?'} บาท\n` +
+            `📈 หนี้จะเพิ่มขึ้น: ${d.shortfall?.toLocaleString() || '?'} บาท/เดือน\n\n` +
+            `✅ แนะนำ: จ่ายอย่างน้อย ${d.minimum_payment?.toLocaleString() || '?'} บาท/เดือน`
+        }
+        
         throw new Error(errorMsg)
       }
       setResult(data)
