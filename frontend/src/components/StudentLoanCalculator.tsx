@@ -125,7 +125,8 @@ export default function StudentLoanCalculator() {
     }
   }
 
-  function formatCurrency(v: number) {
+  function formatCurrency(v: number | undefined | null) {
+    if (v === undefined || v === null || isNaN(v)) return '0.00'
     return v.toLocaleString('th-TH', { minimumFractionDigits: 2 })
   }
 
@@ -566,8 +567,74 @@ export default function StudentLoanCalculator() {
                       </div>
                     )}
 
-                    {/* Action Recommendation */}
-                    {aiProfile.action && (
+                    {/* Personalized Analysis Section */}
+                    {aiProfile.personalized_tips && aiProfile.personalized_tips.length > 0 && (
+                      <div className="mb-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <p className="text-sm font-bold mb-2 text-blue-800 dark:text-blue-200 flex items-center">
+                          📊 วิเคราะห์จากข้อมูลของคุณ
+                        </p>
+                        <ul className="space-y-2">
+                          {aiProfile.personalized_tips.map((tip: string, idx: number) => (
+                            <li key={idx} className="text-sm text-blue-700 dark:text-blue-300 flex items-start">
+                              <span className="mr-2">•</span>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Personalized Actions Section */}
+                    {aiProfile.personalized_actions && aiProfile.personalized_actions.length > 0 && (
+                      <div className="mb-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                        <p className="text-sm font-bold mb-2 text-emerald-800 dark:text-emerald-200 flex items-center">
+                          💡 แนะนำสำหรับคุณ
+                        </p>
+                        <ul className="space-y-2">
+                          {aiProfile.personalized_actions.map((action: string, idx: number) => (
+                            <li key={idx} className="text-sm text-emerald-700 dark:text-emerald-300 flex items-start">
+                              <span className="mr-2">✓</span>
+                              <span>{action}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Financial Summary */}
+                    {aiProfile.financial_summary && (
+                      <div className="mb-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg border border-purple-200 dark:border-purple-700">
+                        <p className="text-sm font-bold mb-2 text-purple-800 dark:text-purple-200 flex items-center">
+                          📈 สรุปสถานะการเงิน
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          {aiProfile.financial_summary.dti_ratio && (
+                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded">
+                              <span className="text-gray-600 dark:text-gray-400">DTI Ratio:</span>
+                              <span className={`ml-1 font-bold ${
+                                parseFloat(aiProfile.financial_summary.dti_ratio) > 40 ? 'text-red-600' :
+                                parseFloat(aiProfile.financial_summary.dti_ratio) > 30 ? 'text-yellow-600' : 'text-emerald-600'
+                              }`}>{aiProfile.financial_summary.dti_ratio}</span>
+                            </div>
+                          )}
+                          {aiProfile.financial_summary.interest_level && (
+                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded">
+                              <span className="text-gray-600 dark:text-gray-400">ดอกเบี้ย:</span>
+                              <span className="ml-1 font-bold text-gray-800 dark:text-gray-200">{aiProfile.financial_summary.interest_level}</span>
+                            </div>
+                          )}
+                          {aiProfile.financial_summary.payoff_duration && (
+                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded col-span-2">
+                              <span className="text-gray-600 dark:text-gray-400">ระยะเวลาผ่อน:</span>
+                              <span className="ml-1 font-bold text-gray-800 dark:text-gray-200">{aiProfile.financial_summary.payoff_duration}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Legacy Action Recommendation (fallback) */}
+                    {aiProfile.action && !aiProfile.personalized_actions && (
                       <div className="mb-3 p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border-2 border-white/50 dark:border-gray-700/50 shadow-sm">
                         <p className="text-sm font-bold mb-1 dark:text-gray-200">{t('ai.recommendation')}</p>
                         <p className="text-sm dark:text-gray-300">{aiProfile.action}</p>
