@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import Layout from './components/Layout';
@@ -49,6 +50,7 @@ function App() {
           </Layout>
         </LanguageProvider>
       </ThemeProvider>
+      <Analytics />
     </ErrorBoundary>
   );
 }
