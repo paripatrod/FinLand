@@ -383,10 +383,17 @@ def calculate_credit_card():
         if monthly_payment < minimum_payment:
             first_month_interest = balance * monthly_rate
             return jsonify({
-                "error": f"⚠️ ยอดจ่ายต่ำเกินไป! ดอกเบี้ยเดือนแรก {first_month_interest:.2f} บาท มากกว่าที่คุณจ่าย",
-                "minimum_payment": round(minimum_payment, 2),
-                "monthly_interest": round(first_month_interest, 2),
-                "recommendation": f"แนะนำจ่ายอย่างน้อย {minimum_payment:.2f} บาท/เดือน เพื่อลดหนี้ได้จริง"
+                "success": False,
+                "error": f"⚠️ ยอดจ่ายต่ำเกินไป!",
+                "error_type": "payment_too_low",
+                "details": {
+                    "monthly_payment": round(monthly_payment, 2),
+                    "monthly_interest": round(first_month_interest, 2),
+                    "minimum_payment": round(minimum_payment, 2),
+                    "shortfall": round(first_month_interest - monthly_payment, 2)
+                },
+                "message": f"คุณจ่าย {monthly_payment:,.0f} บาท แต่ดอกเบี้ยเดือนแรก {first_month_interest:,.0f} บาท\nหนี้จะไม่ลดลงเลย แถมเพิ่มขึ้นอีก {first_month_interest - monthly_payment:,.0f} บาท/เดือน",
+                "recommendation": f"💡 แนะนำ: จ่ายอย่างน้อย {minimum_payment:,.0f} บาท/เดือน เพื่อให้หนี้ลดลงได้จริง"
             }), 400
         
         total_paid = 0

@@ -62,7 +62,13 @@ export default function CreditCardCalculator() {
     try {
       const res = await apiClient.post('/api/calculate/credit-card', payload)
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'ไม่สามารถคำนวณได้')
+      if (!res.ok) {
+        // Build detailed error message
+        let errorMsg = data.error || 'ไม่สามารถคำนวณได้'
+        if (data.message) errorMsg += '\n\n' + data.message
+        if (data.recommendation) errorMsg += '\n\n' + data.recommendation
+        throw new Error(errorMsg)
+      }
       setResult(data)
       
       // Fire confetti
@@ -298,12 +304,12 @@ export default function CreditCardCalculator() {
         </form>
 
         {error && (
-          <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg animate-fade-in">
-            <div className="flex items-center">
-              <span className="text-2xl mr-3">❌</span>
-              <div>
-                <h3 className="text-sm font-bold text-red-800 dark:text-red-300">เกิดข้อผิดพลาด</h3>
-                <p className="text-sm text-red-700 dark:text-red-200 mt-1">{error}</p>
+          <div className="mt-6 p-5 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 border-l-4 border-red-500 rounded-xl animate-fade-in shadow-md">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">⚠️</div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-red-800 dark:text-red-300 mb-2">ยอดจ่ายต่ำเกินไป</h3>
+                <p className="text-sm text-red-700 dark:text-red-200 whitespace-pre-line leading-relaxed">{error}</p>
               </div>
             </div>
           </div>
