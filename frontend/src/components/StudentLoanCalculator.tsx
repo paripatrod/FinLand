@@ -24,9 +24,8 @@ export default function StudentLoanCalculator() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [aiProfile, setAiProfile] = useState<any | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiAnalysis, setAiAnalysis] = useState<any | null>(null)  // New v3.0 AI
+  const [aiAnalysis, setAiAnalysis] = useState<any | null>(null)  // AI v4.0
 
   const whatIfResult = React.useMemo(() => {
     if (!result || extraPayment === 0) return null;
@@ -94,7 +93,7 @@ export default function StudentLoanCalculator() {
       setSaved(true)
       
       // เรียก AI วิเคราะห์โปรไฟล์อัตโนมัติ
-      predictAIProfile(Number(principal), Number(apr), payload.term_months, data.monthly_payment, Number(monthlyIncome))
+      analyzeWithAI(Number(principal), Number(apr), payload.term_months, data.monthly_payment, Number(monthlyIncome))
     } catch (err: any) {
       setError(err.message || String(err))
     } finally {
@@ -102,28 +101,12 @@ export default function StudentLoanCalculator() {
     }
   }
 
-  async function predictAIProfile(loanAmount: number, interestRate: number, termMonths: number, monthlyPayment: number, monthlyIncome: number) {
+  async function analyzeWithAI(loanAmount: number, interestRate: number, termMonths: number, monthlyPayment: number, monthlyIncome: number) {
     setAiLoading(true)
-    setAiProfile(null)
     setAiAnalysis(null)
     
     try {
-      // Call legacy API
-      const res = await apiClient.post('/api/predict', { 
-        loan_amnt: loanAmount, 
-        int_rate: interestRate, 
-        term: termMonths,
-        monthly_payment: monthlyPayment,
-        monthly_income: monthlyIncome
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setAiProfile(data)
-      } else {
-        console.error('AI prediction error:', data)
-      }
-      
-      // Call new v3.0 AI Analysis API
+      // Call AI v4.0 Analysis API
       const aiRes = await apiClient.post('/api/ai-analyze', {
         loan_amount: loanAmount,
         interest_rate: interestRate,
@@ -140,7 +123,7 @@ export default function StudentLoanCalculator() {
         setAiAnalysis(aiData)
       }
     } catch (err) {
-      console.error('AI prediction failed:', err)
+      console.error('AI analysis failed:', err)
     } finally {
       setAiLoading(false)
     }
@@ -553,18 +536,18 @@ export default function StudentLoanCalculator() {
               </div>
             )}
 
-            {/* 🧠 AI Financial Advisor */}
+            {/* 🧠 AI Financial Advisor v4.0 */}
             {aiAnalysis && (
               <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-4 sm:p-5 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 animate-fade-in">
-                {/* Header + Health Score Row */}
+                {/* Header + Risk Meter Row */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-2.5">
                     <div className="p-2 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
+                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน v4.0</h3>
                   </div>
-                  {/* Health Score Inline */}
+                  {/* Health Score + Risk */}
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5 bg-white/80 dark:bg-gray-800/80 px-3 py-1.5 rounded-lg">
                       <span className="text-base">❤️</span>
@@ -585,7 +568,38 @@ export default function StudentLoanCalculator() {
                   </div>
                 </div>
 
-                {/* Debt Analysis (Synced with What-If) - ใช้ค่าจาก term_months */}
+                {/* Risk Meter - NEW v4.0 */}
+                {aiAnalysis.personalized_insights && (
+                  <div className="mb-4 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">📊 Risk Meter</span>
+                      <span className={`text-sm font-bold ${
+                        aiAnalysis.personalized_insights.risk_level === 'low' ? 'text-emerald-600' :
+                        aiAnalysis.personalized_insights.risk_level === 'medium' ? 'text-yellow-600' :
+                        aiAnalysis.personalized_insights.risk_level === 'high' ? 'text-orange-600' :
+                        'text-red-600'
+                      }`}>
+                        {aiAnalysis.personalized_insights.risk_level === 'low' ? '🟢 ความเสี่ยงต่ำ' :
+                         aiAnalysis.personalized_insights.risk_level === 'medium' ? '🟡 ความเสี่ยงปานกลาง' :
+                         aiAnalysis.personalized_insights.risk_level === 'high' ? '🟠 ความเสี่ยงสูง' :
+                         '🔴 ความเสี่ยงวิกฤต'}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                      <div 
+                        className={`h-3 rounded-full transition-all duration-500 ${
+                          aiAnalysis.personalized_insights.risk_level === 'low' ? 'bg-emerald-500' :
+                          aiAnalysis.personalized_insights.risk_level === 'medium' ? 'bg-yellow-500' :
+                          aiAnalysis.personalized_insights.risk_level === 'high' ? 'bg-orange-500' :
+                          'bg-red-500'
+                        }`}
+                        style={{ width: `${aiAnalysis.personalized_insights.risk_meter || 0}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Debt Analysis (Synced with What-If) */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
@@ -613,6 +627,78 @@ export default function StudentLoanCalculator() {
                 ) : aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-3">
                     <div className="text-sm text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
+                  </div>
+                )}
+
+                {/* Personalized Tips - NEW v4.0 */}
+                {aiAnalysis.personalized_insights?.smart_tips && aiAnalysis.personalized_insights.smart_tips.length > 0 && (
+                  <div className="mb-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">💡 คำแนะนำเฉพาะคุณ:</div>
+                    <ul className="space-y-1">
+                      {aiAnalysis.personalized_insights.smart_tips.slice(0, 3).map((tip: string, i: number) => (
+                        <li key={i} className="text-sm text-purple-600 dark:text-purple-400 flex items-start gap-2">
+                          <span className="text-purple-400">•</span>{tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* DTI & Interest Stats - NEW v4.0 */}
+                {aiAnalysis.personalized_insights && (
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {aiAnalysis.personalized_insights.dti_analysis && (
+                      <div className={`p-3 rounded-lg border ${
+                        aiAnalysis.personalized_insights.dti_analysis.status === 'healthy' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700' :
+                        aiAnalysis.personalized_insights.dti_analysis.status === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700' :
+                        'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
+                      }`}>
+                        <div className="text-xs text-gray-500 mb-1">📊 DTI Ratio</div>
+                        <div className={`text-lg font-bold ${
+                          aiAnalysis.personalized_insights.dti_analysis.status === 'healthy' ? 'text-emerald-600 dark:text-emerald-400' :
+                          aiAnalysis.personalized_insights.dti_analysis.status === 'warning' ? 'text-yellow-600 dark:text-yellow-400' :
+                          'text-red-600 dark:text-red-400'
+                        }`}>{aiAnalysis.personalized_insights.dti_analysis.ratio?.toFixed(1)}%</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{aiAnalysis.personalized_insights.dti_analysis.message}</div>
+                      </div>
+                    )}
+                    {aiAnalysis.personalized_insights.interest_analysis && (
+                      <div className={`p-3 rounded-lg border ${
+                        aiAnalysis.personalized_insights.interest_analysis.level === 'low' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700' :
+                        aiAnalysis.personalized_insights.interest_analysis.level === 'medium' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700' :
+                        'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
+                      }`}>
+                        <div className="text-xs text-gray-500 mb-1">💰 ดอกเบี้ย</div>
+                        <div className={`text-lg font-bold ${
+                          aiAnalysis.personalized_insights.interest_analysis.level === 'low' ? 'text-emerald-600 dark:text-emerald-400' :
+                          aiAnalysis.personalized_insights.interest_analysis.level === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
+                          'text-red-600 dark:text-red-400'
+                        }`}>{formatCurrency(aiAnalysis.personalized_insights.interest_analysis.monthly_cost)}/ด.</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{aiAnalysis.personalized_insights.interest_analysis.message}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Action Cards - NEW v4.0 */}
+                {aiAnalysis.personalized_insights?.action_cards && aiAnalysis.personalized_insights.action_cards.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">🎯 Actions:</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {aiAnalysis.personalized_insights.action_cards.map((action: any, i: number) => (
+                        <div key={i} className={`p-2.5 rounded-lg border flex items-center gap-2 ${
+                          action.priority === 'high' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700' :
+                          action.priority === 'medium' ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700' :
+                          'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
+                        }`}>
+                          <span className="text-lg">{action.icon}</span>
+                          <div>
+                            <div className="text-xs font-semibold text-gray-800 dark:text-gray-200">{action.title}</div>
+                            <div className="text-[10px] text-gray-600 dark:text-gray-400">{action.description}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 

@@ -24,9 +24,8 @@ export default function CreditCardCalculator() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [aiProfile, setAiProfile] = useState<any | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiAnalysis, setAiAnalysis] = useState<any | null>(null)  // New v3.0 AI
+  const [aiAnalysis, setAiAnalysis] = useState<any | null>(null)  // AI v4.0
 
   const whatIfResult = React.useMemo(() => {
     if (!result || extraPayment === 0) return null;
@@ -99,8 +98,8 @@ export default function CreditCardCalculator() {
       })
       setSaved(true)
       
-      // เรียก AI วิเคราะห์โปรไฟล์อัตโนมัติ
-      predictAIProfile(Number(balance), Number(apr), data.months, Number(monthlyPayment), Number(monthlyIncome))
+      // เรียก AI วิเคราะห์โปรไฟล์อัตโนมัติ (v4.0 - Combined)
+      analyzeWithAI(Number(balance), Number(apr), data.months, Number(monthlyPayment), Number(monthlyIncome))
     } catch (err: any) {
       setError(err.message || String(err))
     } finally {
@@ -108,28 +107,12 @@ export default function CreditCardCalculator() {
     }
   }
 
-  async function predictAIProfile(loanAmount: number, interestRate: number, termMonths: number, monthlyPayment: number, monthlyIncome: number) {
+  async function analyzeWithAI(loanAmount: number, interestRate: number, termMonths: number, monthlyPayment: number, monthlyIncome: number) {
     setAiLoading(true)
-    setAiProfile(null)
     setAiAnalysis(null)
     
     try {
-      // Call legacy API
-      const res = await apiClient.post('/api/predict', { 
-        loan_amnt: loanAmount, 
-        int_rate: interestRate, 
-        term: termMonths,
-        monthly_payment: monthlyPayment,
-        monthly_income: monthlyIncome
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setAiProfile(data)
-      } else {
-        console.error('AI prediction error:', data)
-      }
-      
-      // Call new v3.0 AI Analysis API
+      // Call AI Analysis v4.0 (Combined with Legacy insights)
       const aiRes = await apiClient.post('/api/ai-analyze', {
         loan_amount: loanAmount,
         interest_rate: interestRate,
@@ -146,7 +129,7 @@ export default function CreditCardCalculator() {
         setAiAnalysis(aiData)
       }
     } catch (err) {
-      console.error('AI prediction failed:', err)
+      console.error('AI analysis failed:', err)
     } finally {
       setAiLoading(false)
     }
@@ -537,7 +520,7 @@ export default function CreditCardCalculator() {
               </div>
             </div>
 
-            {/* 🧠 AI Financial Advisor - Combined Analysis */}
+            {/* 🧠 AI Financial Advisor v4.0 - Ultimate Edition */}
             {aiLoading && (
               <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900/20 to-indigo-50 dark:to-indigo-900/20 p-6 rounded-xl shadow-md border-2 border-purple-200 dark:border-purple-700 animate-pulse">
                 <div className="flex items-center space-x-3">
@@ -547,78 +530,143 @@ export default function CreditCardCalculator() {
               </div>
             )}
 
-            {/* 🧠 AI Financial Advisor */}
             {aiAnalysis && (
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-4 sm:p-5 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 animate-fade-in">
-                {/* Header + Health Score Row */}
+              <div className={`p-4 sm:p-5 rounded-xl shadow-md border animate-fade-in ${
+                aiAnalysis.insights?.severity === 'critical' ? 'bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/30 dark:via-orange-900/30 dark:to-yellow-900/30 border-red-300 dark:border-red-700' :
+                aiAnalysis.insights?.severity === 'high' ? 'bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-900/30 dark:via-amber-900/30 dark:to-yellow-900/30 border-orange-300 dark:border-orange-700' :
+                aiAnalysis.insights?.severity === 'medium' ? 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 dark:from-yellow-900/30 dark:via-amber-900/30 dark:to-orange-900/30 border-yellow-300 dark:border-yellow-700' :
+                'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-900/30 dark:via-teal-900/30 dark:to-cyan-900/30 border-emerald-300 dark:border-emerald-700'
+              }`}>
+                {/* Header Row */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow">
+                    <div className={`p-2 rounded-lg shadow ${
+                      aiAnalysis.insights?.severity === 'critical' ? 'bg-gradient-to-br from-red-500 to-orange-500' :
+                      aiAnalysis.insights?.severity === 'high' ? 'bg-gradient-to-br from-orange-500 to-amber-500' :
+                      aiAnalysis.insights?.severity === 'medium' ? 'bg-gradient-to-br from-yellow-500 to-amber-500' :
+                      'bg-gradient-to-br from-emerald-500 to-teal-500'
+                    }`}>
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
-                  </div>
-                  {/* Health Score Inline */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 bg-white/80 dark:bg-gray-800/80 px-3 py-1.5 rounded-lg">
-                      <span className="text-base">❤️</span>
-                      <span className={`text-xl font-bold ${
-                        aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
-                        aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
-                        'text-red-600 dark:text-red-400'
-                      }`}>{aiAnalysis.financial_health?.health_score}</span>
-                      <span className="text-xs text-gray-500">/100</span>
+                    <div>
+                      <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
+                      <p className="text-[10px] text-gray-500">v{aiAnalysis.version}</p>
                     </div>
-                    <div className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                      aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
-                      aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
-                      'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
-                    }`}>
-                      {aiAnalysis.strategy?.urgency_level}
+                  </div>
+                  {/* Severity Badge */}
+                  <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                    aiAnalysis.insights?.severity === 'critical' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' :
+                    aiAnalysis.insights?.severity === 'high' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300' :
+                    aiAnalysis.insights?.severity === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
+                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                  }`}>
+                    {aiAnalysis.insights?.severity === 'critical' ? '🚨 วิกฤต' :
+                     aiAnalysis.insights?.severity === 'high' ? '⚠️ เสี่ยงสูง' :
+                     aiAnalysis.insights?.severity === 'medium' ? '📊 ปานกลาง' : '✅ ปลอดภัย'}
+                  </div>
+                </div>
+
+                {/* Health Score + Risk Meter Row */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500">❤️ สุขภาพการเงิน</span>
+                      <span className={`text-xl font-bold ${
+                        aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600' :
+                        aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600' : 'text-red-600'
+                      }`}>{aiAnalysis.financial_health?.health_score}/100</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className={`h-2 rounded-full transition-all duration-1000 ${
+                        aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-500' :
+                        aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`} style={{ width: `${aiAnalysis.financial_health?.health_score}%` }} />
+                    </div>
+                  </div>
+                  <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-500">⚡ ระดับความเสี่ยง</span>
+                      <span className={`text-xl font-bold ${
+                        aiAnalysis.insights?.risk_score >= 70 ? 'text-red-600' :
+                        aiAnalysis.insights?.risk_score >= 50 ? 'text-orange-600' :
+                        aiAnalysis.insights?.risk_score >= 30 ? 'text-yellow-600' : 'text-emerald-600'
+                      }`}>{aiAnalysis.insights?.risk_score}/100</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className={`h-2 rounded-full transition-all duration-1000 ${
+                        aiAnalysis.insights?.risk_score >= 70 ? 'bg-red-500' :
+                        aiAnalysis.insights?.risk_score >= 50 ? 'bg-orange-500' :
+                        aiAnalysis.insights?.risk_score >= 30 ? 'bg-yellow-500' : 'bg-emerald-500'
+                      }`} style={{ width: `${aiAnalysis.insights?.risk_score}%` }} />
                     </div>
                   </div>
                 </div>
 
-                {/* Debt Analysis (Synced with What-If) - ใช้ค่าจาก result.months */}
+                {/* Debt Analysis Row */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
+                  <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg relative">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {extraPayment > 0 && whatIfResult ? whatIfResult.months : result?.months || aiAnalysis.debt_analysis?.debt_freedom_months}
                       <span className="text-xs text-gray-500 ml-1">เดือน</span>
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">ปลดหนี้</div>
+                    <div className="text-xs text-gray-600">ปลดหนี้</div>
                     {extraPayment > 0 && whatIfResult && whatIfResult.savedMonths > 0 && (
                       <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full">-{whatIfResult.savedMonths}</div>
                     )}
                   </div>
-                  <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+                  <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg">
                     <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                       +{formatCurrency(extraPayment > 0 ? extraPayment : aiAnalysis.debt_analysis?.smart_payment_boost)}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม/เดือน'}</div>
+                    <div className="text-xs text-gray-600">{extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม'}</div>
                   </div>
                 </div>
 
-                {/* What-If or Tip */}
-                {extraPayment > 0 && whatIfResult ? (
-                  <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700 mb-3">
-                    <div className="text-sm text-emerald-700 dark:text-emerald-300">🎯 <b>What-If:</b> เร็วขึ้น <b className="text-emerald-600">{whatIfResult.savedMonths}</b> เดือน ประหยัด <b className="text-emerald-600">{formatCurrency(whatIfResult.savedInterest)}</b></div>
+                {/* What-If Result */}
+                {extraPayment > 0 && whatIfResult && (
+                  <div className="p-3 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg border border-emerald-300 dark:border-emerald-600 mb-3">
+                    <div className="text-sm text-emerald-800 dark:text-emerald-200">
+                      🎯 <b>What-If:</b> เร็วขึ้น <b>{whatIfResult.savedMonths}</b> เดือน ประหยัด <b>{formatCurrency(whatIfResult.savedInterest)}</b> บาท
+                    </div>
                   </div>
-                ) : aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-3">
-                    <div className="text-sm text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
+                )}
+
+                {/* 📊 Personalized Tips Section */}
+                {aiAnalysis.insights?.tips && aiAnalysis.insights.tips.length > 0 && (
+                  <div className="mb-3 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg">
+                    <div className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">📊 วิเคราะห์จากข้อมูลของคุณ</div>
+                    <div className="space-y-1.5">
+                      {aiAnalysis.insights.tips.map((tip: string, i: number) => (
+                        <div key={i} className="text-sm text-gray-700 dark:text-gray-300">{tip}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 💡 Action Cards */}
+                {aiAnalysis.insights?.actions && aiAnalysis.insights.actions.length > 0 && (
+                  <div className="mb-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg border border-amber-200 dark:border-amber-700">
+                    <div className="text-xs font-bold text-amber-800 dark:text-amber-200 mb-2">💡 สิ่งที่ควรทำ</div>
+                    <div className="space-y-1.5">
+                      {aiAnalysis.insights.actions.map((action: string, i: number) => (
+                        <div key={i} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                          <span className="font-bold">{i + 1}.</span>
+                          <span>{action}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {/* Strategy Row */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="text-xs text-gray-500 mb-1">🎯 กลยุทธ์แนะนำ</div>
+                    <div className="text-xs text-gray-500 mb-1">🎯 กลยุทธ์</div>
                     <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
                   </div>
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
-                    <div className="text-xs text-gray-500 mb-1">⭐ สิ่งที่ควรทำก่อน</div>
-                    <div className="font-semibold text-sm text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
+                  <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+                    <div className="text-xs text-gray-500 mb-1">⭐ Action</div>
+                    <div className="font-semibold text-sm text-purple-700 dark:text-purple-300">{aiAnalysis.strategy?.primary_action}</div>
                   </div>
                 </div>
 

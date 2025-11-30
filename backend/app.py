@@ -768,24 +768,122 @@ def ai_analyze():
         urgency_labels = advisor['urgency_labels']
         support_labels = advisor['support_labels']
         
+        # ═══════════════════════════════════════════════════════════════════════
+        # 🎯 PERSONALIZED INSIGHTS v4.0 - Smart Analysis based on actual data
+        # ═══════════════════════════════════════════════════════════════════════
+        
+        # Calculate key metrics
+        monthly_rate = interest_rate / 100 / 12
+        monthly_interest = loan_amount * monthly_rate if monthly_rate > 0 else 0
+        total_interest = (monthly_payment * term_months) - loan_amount if monthly_payment > 0 else 0
+        years_to_payoff = term_months / 12
+        
+        # Determine severity level based on multiple factors
+        severity = 'low'
+        risk_score = 30
+        
+        if dti_ratio > 50 or interest_rate >= 20:
+            severity = 'critical'
+            risk_score = min(99, 75 + (dti_ratio - 50) / 2 if dti_ratio > 50 else 75 + (interest_rate - 20))
+        elif dti_ratio > 40 or interest_rate >= 15:
+            severity = 'high'
+            risk_score = min(85, 55 + (dti_ratio - 40) if dti_ratio > 40 else 55 + (interest_rate - 15) * 2)
+        elif dti_ratio > 30 or interest_rate >= 10:
+            severity = 'medium'
+            risk_score = min(65, 35 + (dti_ratio - 30) if dti_ratio > 30 else 35 + (interest_rate - 10) * 2)
+        else:
+            severity = 'low'
+            risk_score = max(10, 30 - (30 - dti_ratio) / 2)
+        
+        # Generate personalized tips
+        tips = []
+        actions = []
+        
+        # 1. DTI Analysis
+        if dti_ratio > 50:
+            tips.append(f"🚨 หนี้กินรายได้ {dti_ratio:.0f}% วิกฤต! (ควรต่ำกว่า 30%)")
+            actions.append("หารายได้เสริมด่วน หรือเจรจาปรับโครงสร้างหนี้")
+        elif dti_ratio > 40:
+            tips.append(f"⚠️ ภาระหนี้ {dti_ratio:.0f}% ของรายได้ ค่อนข้างหนัก")
+            actions.append("ลดรายจ่ายฟุ่มเฟือย เน้นจ่ายหนี้ให้เร็วขึ้น")
+        elif dti_ratio > 30:
+            tips.append(f"📊 ภาระหนี้ {dti_ratio:.0f}% พอรับไหว แต่อย่าประมาท")
+            actions.append("สร้างเงินสำรองฉุกเฉินควบคู่ไปด้วย")
+        elif dti_ratio > 0:
+            tips.append(f"✅ ภาระหนี้ {dti_ratio:.0f}% อยู่ในเกณฑ์ดีมาก!")
+        
+        # 2. Interest Rate Analysis
+        if interest_rate >= 20:
+            tips.append(f"🔥 ดอกเบี้ย {interest_rate}% สูงมาก! เสียดอกเบี้ย ~{monthly_interest:,.0f} บาท/เดือน")
+            actions.append("รีบหาสินเชื่อดอกต่ำมาปิดด่วน (Debt Consolidation)")
+        elif interest_rate >= 15:
+            tips.append(f"💳 ดอกเบี้ย {interest_rate}% ระดับบัตรเครดิต จ่ายดอกเบี้ย ~{monthly_interest:,.0f}/เดือน")
+            actions.append("รีไฟแนนซ์หาดอกเบี้ยต่ำกว่า หรือโอนไป 0%")
+        elif interest_rate >= 8:
+            tips.append(f"📈 ดอกเบี้ย {interest_rate}% ปานกลาง")
+            if interest_rate > 10:
+                actions.append("ลองเปรียบเทียบดอกเบี้ยกับธนาคารอื่น")
+        elif interest_rate >= 2:
+            tips.append(f"👍 ดอกเบี้ย {interest_rate}% ถือว่าต่ำ")
+        else:
+            tips.append(f"✨ ดอกเบี้ย {interest_rate}% ต่ำมาก (ระดับ กยศ.)")
+        
+        # 3. Time to Payoff Analysis
+        if years_to_payoff > 10:
+            tips.append(f"⏰ ผ่อนนาน {years_to_payoff:.1f} ปี ดอกเบี้ยรวม {total_interest:,.0f} บาท")
+            actions.append("จ่ายเพิ่มทุกเดือนจะประหยัดเงินมหาศาล")
+        elif years_to_payoff > 5:
+            tips.append(f"📅 ผ่อน {years_to_payoff:.1f} ปี ({term_months:.0f} เดือน)")
+        elif years_to_payoff > 0:
+            tips.append(f"🎯 อีก {term_months:.0f} เดือน จะปลดหนี้สำเร็จ!")
+        
+        # 4. Smart Payment Advice
+        smart_boost = round(max(0, reg_pred[1]), 0)
+        time_saved = round(max(0, reg_pred[2]), 0)
+        money_saved = round(max(0, reg_pred[3]), 0)
+        
+        if smart_boost > 0 and time_saved > 0:
+            tips.append(f"💡 จ่ายเพิ่ม {smart_boost:,.0f}/เดือน เร็วขึ้น {time_saved} เดือน ประหยัด {money_saved:,.0f} บาท")
+        
+        # 5. Health Score Commentary
+        health_score = round(min(100, max(0, reg_pred[5])), 0)
+        if health_score >= 80:
+            tips.append("💚 สุขภาพการเงินดีเยี่ยม! รักษาระดับนี้ไว้")
+        elif health_score >= 60:
+            tips.append("💛 สุขภาพการเงินพอใช้ได้ มีโอกาสพัฒนาอีก")
+        elif health_score >= 40:
+            tips.append("🟠 สุขภาพการเงินต้องระวัง ควรปรับพฤติกรรม")
+        else:
+            tips.append("❤️‍🩹 สุขภาพการเงินน่าเป็นห่วง ต้องเร่งแก้ไข")
+        
         # Build response
         response = {
             "success": True,
-            "version": advisor.get('version', '3.0.0'),
+            "version": "4.0.0",
             "training_samples": advisor.get('training_samples', 0),
+            
+            # NEW: Personalized Insights
+            "insights": {
+                "severity": severity,
+                "risk_score": round(risk_score),
+                "tips": tips[:5],  # Max 5 tips
+                "actions": actions[:3],  # Max 3 actions
+                "monthly_interest": round(monthly_interest, 0),
+                "total_interest": round(total_interest, 0)
+            },
             
             # Group A: Debt Analysis
             "debt_analysis": {
                 "debt_freedom_months": round(max(0, reg_pred[0]), 0),
-                "smart_payment_boost": round(max(0, reg_pred[1]), 0),
-                "time_saved_months": round(max(0, reg_pred[2]), 0),
-                "money_saved_total": round(max(0, reg_pred[3]), 0),
+                "smart_payment_boost": smart_boost,
+                "time_saved_months": time_saved,
+                "money_saved_total": money_saved,
                 "interest_burden_ratio": round(max(0, reg_pred[4]), 1)
             },
             
             # Group B: Financial Health
             "financial_health": {
-                "health_score": round(min(100, max(0, reg_pred[5])), 0),
+                "health_score": health_score,
                 "debt_stress_index": round(min(100, max(0, reg_pred[6])), 0),
                 "stability_score": round(min(100, max(0, reg_pred[7])), 0),
                 "wealth_potential": round(min(100, max(0, reg_pred[8])), 0)
