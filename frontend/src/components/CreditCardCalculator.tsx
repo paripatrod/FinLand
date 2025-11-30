@@ -267,11 +267,11 @@ export default function CreditCardCalculator() {
 
             <CurrencyInput
               id="monthlyIncome"
-              label={t('common.monthlyIncome') || 'รายได้ต่อเดือน (เพื่อวิเคราะห์ความเสี่ยง)'}
+              label={t('common.monthlyIncome') || 'รายได้ต่อเดือน'}
               value={monthlyIncome}
               onChange={setMonthlyIncome}
               placeholder="25000"
-              helpText="ระบุเพื่อรับคำแนะนำที่แม่นยำขึ้น (ไม่บังคับ)"
+              helpText="ใช้คำนวณสัดส่วนหนี้ต่อรายได้ (DTI)"
             />
           </div>
 

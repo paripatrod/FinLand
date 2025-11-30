@@ -647,10 +647,59 @@ def ai_analyze():
         elif years_to_payoff > 0:
             tips.append(f"🎯 อีก {term_months:.0f} เดือน จะปลดหนี้สำเร็จ!")
         
-        # 4. Smart Payment Advice
-        smart_boost = round(max(0, reg_pred[1]), 0)
-        time_saved = round(max(0, reg_pred[2]), 0)
-        money_saved = round(max(0, reg_pred[3]), 0)
+        # 4. Smart Payment Advice - CALCULATE REAL VALUES (not ML prediction)
+        # คำนวณยอดจ่ายเพิ่มที่เหมาะสม
+        smart_boost = 0
+        time_saved = 0
+        money_saved = 0
+        
+        if monthly_income > 0 and monthly_payment > 0 and loan_amount > 0:
+            # คำนวณ smart_boost: จ่ายเพิ่มได้เท่าไหร่โดยไม่เกิน DTI 40%
+            max_dti = 40
+            max_payment_by_dti = monthly_income * (max_dti / 100)
+            
+            # เหลือใช้จ่ายอย่างน้อย 40% ของรายได้
+            min_living = monthly_income * 0.4
+            max_affordable = max(0, monthly_income - monthly_payment - min_living)
+            
+            # smart_boost = ส่วนต่างที่จ่ายเพิ่มได้
+            available_boost = max(0, max_payment_by_dti - monthly_payment)
+            smart_boost = min(available_boost, max_affordable)
+            
+            # ปัดเป็นหลักร้อย
+            smart_boost = round(smart_boost / 100) * 100
+            
+            # คำนวณเวลาและเงินที่ประหยัดได้
+            if smart_boost > 0 and monthly_rate > 0:
+                # คำนวณเดือนเดิม
+                original_months = 0
+                balance = loan_amount
+                while balance > 0 and original_months < 600:
+                    interest = balance * monthly_rate
+                    if monthly_payment <= interest:
+                        original_months = 999
+                        break
+                    principal = monthly_payment - interest
+                    balance -= principal
+                    original_months += 1
+                
+                # คำนวณเดือนใหม่ (จ่ายเพิ่ม)
+                new_payment = monthly_payment + smart_boost
+                new_months = 0
+                balance = loan_amount
+                while balance > 0 and new_months < 600:
+                    interest = balance * monthly_rate
+                    principal = new_payment - interest
+                    balance -= principal
+                    new_months += 1
+                
+                if original_months < 999:
+                    time_saved = original_months - new_months
+                    
+                    # คำนวณดอกเบี้ยที่ประหยัดได้
+                    old_interest = (monthly_payment * original_months) - loan_amount
+                    new_interest = (new_payment * new_months) - loan_amount
+                    money_saved = max(0, old_interest - new_interest)
         
         if smart_boost > 0 and time_saved > 0:
             tips.append(f"💡 จ่ายเพิ่ม {smart_boost:,.0f}/เดือน เร็วขึ้น {time_saved} เดือน ประหยัด {money_saved:,.0f} บาท")
@@ -682,12 +731,12 @@ def ai_analyze():
                 "total_interest": round(total_interest, 0)
             },
             
-            # Group A: Debt Analysis
+            # Group A: Debt Analysis - ใช้ค่าคำนวณจริง
             "debt_analysis": {
-                "debt_freedom_months": round(max(0, reg_pred[0]), 0),
+                "debt_freedom_months": round(term_months, 0),  # ใช้ term_months ที่ส่งมา
                 "smart_payment_boost": smart_boost,
                 "time_saved_months": time_saved,
-                "money_saved_total": money_saved,
+                "money_saved_total": round(money_saved, 0),
                 "interest_burden_ratio": round(max(0, reg_pred[4]), 1)
             },
             
