@@ -1,0 +1,11 @@
+# robots.txt for FinLand
+# https://financial-calculator-thailand.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://financial-calculator-thailand.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, be polite to search engines)
+Crawl-delay: 1

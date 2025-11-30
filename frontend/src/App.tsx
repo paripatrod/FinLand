@@ -16,6 +16,9 @@ const CreditCardCalculator = lazy(() => import('./components/CreditCardCalculato
 const StudentLoanCalculator = lazy(() => import('./components/StudentLoanCalculator'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const OnboardingTutorial = lazy(() => import('./components/OnboardingTutorial'));
+const NotFound = lazy(() => import('./components/NotFound'));
+const About = lazy(() => import('./components/About'));
+const Privacy = lazy(() => import('./components/Privacy'));
 
 function App() {
   const location = useLocation();
@@ -44,6 +47,9 @@ function App() {
                   <Route path="/student-loan" element={<StudentLoanCalculator />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/tutorial" element={<OnboardingTutorial />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </AnimatePresence>

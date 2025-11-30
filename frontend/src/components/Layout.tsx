@@ -340,6 +340,14 @@ export default function Layout({ children }: LayoutProps) {
                 {t('footer.contactText')}<br />
                 {t('footer.email')}: info@example.com
               </p>
+              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-3">
+                <Link to="/about" className="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
+                  {language === 'th' ? 'เกี่ยวกับเรา' : 'About'}
+                </Link>
+                <Link to="/privacy" className="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400">
+                  {language === 'th' ? 'นโยบายความเป็นส่วนตัว' : 'Privacy'}
+                </Link>
+              </div>
             </div>
           </div>
           
