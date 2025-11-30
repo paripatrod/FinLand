@@ -98,6 +98,13 @@ export default function OnboardingTutorial() {
     }
   }, [isDirectAccess]);
 
+  // Scroll to top when tutorial opens (especially for mobile)
+  useEffect(() => {
+    if (isVisible) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [isVisible]);
+
   const handleNext = () => {
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);

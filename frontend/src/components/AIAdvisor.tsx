@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { MessageCircle, Sparkles, TrendingDown, TrendingUp, Calculator, X, Send, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { MessageCircle, Sparkles, X, Send, User, Bot, RotateCcw } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ScenarioComparison } from '../types';
@@ -10,19 +10,32 @@ interface AIAdvisorProps {
   currentPayment: number;
 }
 
+interface ChatMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  comparison?: ScenarioComparison;
+  timestamp: Date;
+}
+
 export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState<string | null>(null);
-  const [comparison, setComparison] = useState<ScenarioComparison | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll to bottom when new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // คำนวณผลลัพธ์สำหรับยอดจ่ายต่างๆ
   const calculateScenario = (monthlyPayment: number) => {
     const monthlyRate = apr / 100 / 12;
-    
-    // Check if payment covers interest
     const minInterest = balance * monthlyRate;
+    
     if (monthlyPayment <= minInterest) {
       return { error: 'payment_too_low', minPayment: minInterest };
     }
@@ -30,12 +43,11 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
     let remainingBalance = balance;
     let totalInterest = 0;
     let months = 0;
-    const maxMonths = 600; // 50 years max
+    const maxMonths = 600;
 
     while (remainingBalance > 0.01 && months < maxMonths) {
       const interestCharge = remainingBalance * monthlyRate;
       const principalPayment = monthlyPayment - interestCharge;
-
       totalInterest += interestCharge;
       remainingBalance -= principalPayment;
       months++;
@@ -49,163 +61,179 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
     };
   };
 
-  // วิเคราะห์คำถามและตอบ
-  const analyzeQuestion = () => {
-    const q = question.toLowerCase();
+  // วิเคราะห์คำถามและสร้างคำตอบ
+  const analyzeQuestion = (questionText: string): { answer: string; comparison?: ScenarioComparison } => {
+    const q = questionText.toLowerCase();
+    const numbers = questionText.match(/\d{1,3}(,\d{3})*(\.\d+)?/g)?.map(n => parseFloat(n.replace(/,/g, ''))) || [];
     
-    // ตรวจจับตัวเลขในคำถาม
-    const numbers = question.match(/\d{1,3}(,\d{3})*(\.\d+)?/g)?.map(n => parseFloat(n.replace(/,/g, ''))) || [];
-    
-    // Case 1: เปรียบเทียบยอดจ่าย 2 แบบ (เช่น "2000 vs 3000" หรือ "เปรียบเทียบ 2000 กับ 3000")
+    // Case 1: เปรียบเทียบยอดจ่าย 2 แบบ
     if (((q.includes('vs') || q.includes('กับ') || q.includes('เปรียบเทียบ') || q.includes('compare')) && numbers.length >= 2) ||
-        ((q.includes('เพิ่ม') || q.includes('เปลี่ยน') || q.includes('ถ้า') || q.includes('if') || q.includes('change')) && 
-        (q.includes('จ่าย') || q.includes('ชำระ') || q.includes('pay')) && numbers.length >= 2)) {
+        ((q.includes('เพิ่ม') || q.includes('ถ้า') || q.includes('if')) && numbers.length >= 2)) {
       
       const payment1 = numbers[0];
       const payment2 = numbers[1];
-      
       const scenario1 = calculateScenario(payment1);
       const scenario2 = calculateScenario(payment2);
       
-      if (!scenario1 || 'error' in scenario1 || !scenario2 || 'error' in scenario2) {
-        const err1 = scenario1 && 'error' in scenario1 ? scenario1 : null;
-        const err2 = scenario2 && 'error' in scenario2 ? scenario2 : null;
-        
-        if (err1?.error === 'payment_too_low') {
-             setAnswer(`⚠️ **${t('advisor.warning')}**: ยอดจ่าย ${payment1.toLocaleString()} บาท น้อยกว่าดอกเบี้ยขั้นต่ำ (${err1.minPayment.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท) หนี้จะไม่หมด!`);
-        } else if (err2?.error === 'payment_too_low') {
-             setAnswer(`⚠️ **${t('advisor.warning')}**: ยอดจ่าย ${payment2.toLocaleString()} บาท น้อยกว่าดอกเบี้ยขั้นต่ำ (${err2.minPayment.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท) หนี้จะไม่หมด!`);
-        } else {
-             setAnswer(`⚠️ ${t('advisor.answer.tooLow') || 'Payment too low to cover interest'}`);
-        }
-        setComparison(null);
-        return;
+      if ('error' in scenario1 || 'error' in scenario2) {
+        const err = 'error' in scenario1 ? scenario1 : scenario2;
+        return { 
+          answer: `⚠️ ยอดจ่ายน้อยเกินไป! ดอกเบี้ยขั้นต่ำคือ ${Math.ceil(err.minPayment).toLocaleString()} บาท/เดือน` 
+        };
       }
       
-      const monthsDiff = scenario1.months - scenario2.months;
-      const interestSaved = scenario1.totalInterest - scenario2.totalInterest;
-      const totalSaved = scenario1.totalPaid - scenario2.totalPaid;
-      
-      setComparison({
-        scenario1,
-        scenario2,
+      const comparison: ScenarioComparison = {
+        scenario1: scenario1 as any,
+        scenario2: scenario2 as any,
         savings: {
-          months: monthsDiff,
-          interest: interestSaved,
-          total: totalSaved,
-          percentage: (interestSaved / scenario1.totalInterest) * 100
+          months: scenario1.months - scenario2.months,
+          interest: scenario1.totalInterest - scenario2.totalInterest,
+          total: scenario1.totalPaid - scenario2.totalPaid,
+          percentage: ((scenario1.totalInterest - scenario2.totalInterest) / scenario1.totalInterest) * 100
         }
-      });
+      };
       
-      const savingsPercentage = (interestSaved / scenario1.totalInterest) * 100;
-      
-      const years1 = Math.floor(scenario1.months / 12);
-      const years2 = Math.floor(scenario2.months / 12);
-      const monthsSaved = scenario1.months - scenario2.months;
-      const yearsSaved = Math.floor(monthsSaved / 12);
-      
-      setAnswer(
-        `🎯 **${t('advisor.result')}**\n\n` +
-        `${t('advisor.scenario1')}: **${payment1.toLocaleString()} ${t('common.currency')}**\n` +
-        `├ ⏱️ ใช้เวลา: **${scenario1.months} ${t('common.months')}** (${years1} ปี ${scenario1.months % 12} ${t('common.months')})\n` +
-        `├ 💸 ดอกเบี้ยรวม: **${scenario1.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n` +
-        `└ 💰 จ่ายทั้งหมด: **${scenario1.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n\n` +
-        `${t('advisor.scenario2')}: **${payment2.toLocaleString()} ${t('common.currency')}** ⭐\n` +
-        `├ ⏱️ ใช้เวลา: **${scenario2.months} ${t('common.months')}** (${years2} ปี ${scenario2.months % 12} ${t('common.months')})\n` +
-        `├ 💸 ดอกเบี้ยรวม: **${scenario2.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n` +
-        `└ 💰 จ่ายทั้งหมด: **${scenario2.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n\n` +
-        `🎉 **${t('advisor.savings')}**\n` +
-        `⚡ เร็วขึ้น: **${monthsDiff} ${t('common.months')}** ${yearsSaved > 0 ? `(${yearsSaved} ปี!)` : ''}\n` +
-        `💰 ประหยัด: **${interestSaved.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}** (${savingsPercentage.toFixed(1)}%)\n` +
-        `💵 รวมประหยัด: **${totalSaved.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n\n` +
-        `💡 **${t('advisor.recommendation')}:** จ่าย **${payment2.toLocaleString()} ${t('common.currency')}** ดีกว่ามาก! คุ้มค่าที่สุด! 🏆`
-      );
-      return;
+      return {
+        answer: `📊 เปรียบเทียบการจ่าย\n\n` +
+          `💳 จ่าย ${payment1.toLocaleString()} บาท:\n` +
+          `  ⏱️ ${scenario1.months} เดือน (${Math.floor(scenario1.months/12)} ปี)\n` +
+          `  💸 ดอกเบี้ย ${scenario1.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n\n` +
+          `💳 จ่าย ${payment2.toLocaleString()} บาท:\n` +
+          `  ⏱️ ${scenario2.months} เดือน (${Math.floor(scenario2.months/12)} ปี)\n` +
+          `  💸 ดอกเบี้ย ${scenario2.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n\n` +
+          `🎉 ถ้าจ่าย ${payment2.toLocaleString()} บาท:\n` +
+          `  ✅ เร็วขึ้น ${comparison.savings.months} เดือน\n` +
+          `  ✅ ประหยัด ${comparison.savings.interest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท`,
+        comparison
+      };
     }
     
     // Case 2: ถามว่าควรจ่ายเท่าไหร่
-    if (q.includes('ควรจ่าย') || q.includes('จ่ายเท่าไหร่') || q.includes('แนะนำ') || q.includes('should') || q.includes('recommend')) {
+    if (q.includes('ควรจ่าย') || q.includes('แนะนำ') || q.includes('should') || q.includes('recommend') || q.includes('ดี')) {
       const monthlyRate = balance * (apr / 100 / 12);
       const minPayment = Math.ceil(monthlyRate * 1.05);
-      const recommended = Math.ceil(balance * 0.05); // 5% ของยอดหนี้
-      const ideal = Math.ceil(balance * 0.10); // 10% ของยอดหนี้
+      const recommended = Math.ceil(balance * 0.05);
+      const ideal = Math.ceil(balance * 0.10);
       
       const minScenario = calculateScenario(minPayment);
       const recScenario = calculateScenario(recommended);
       const idealScenario = calculateScenario(ideal);
       
-      const minYears = Math.floor((minScenario?.months || 0) / 12);
-      const recYears = Math.floor((recScenario?.months || 0) / 12);
-      const idealYears = Math.floor((idealScenario?.months || 0) / 12);
+      const getMonths = (s: any) => 'months' in s ? s.months : 999;
+      const getInterest = (s: any) => 'totalInterest' in s ? s.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0}) : '-';
       
-      setAnswer(
-        `💡 **${t('advisor.recommendation')}**\n\n` +
-        `⚠️ **${t('advisor.minPayment')}: ${minPayment.toLocaleString()} ${t('common.currency')}**\n` +
-        `├ ⏱️ ใช้เวลา: **${minScenario?.months} ${t('common.months')}** (${minYears} ปี!)  ❌ นานมาก!\n` +
-        `├ 💸 ดอกเบี้ย: **${(minScenario?.totalInterest || 0).toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}** ❌ สูงมาก!\n` +
-        `└ ⚠️ **หนี้จะไม่หมดง่ายๆ** ใช้เวลานานมาก!\n\n` +
-        `👍 **${t('advisor.recommendedPayment')}: ${recommended.toLocaleString()} ${t('common.currency')}** (5% ของยอดหนี้)\n` +
-        `├ ⏱️ ใช้เวลา: **${recScenario?.months} ${t('common.months')}** (${recYears} ปี)\n` +
-        `├ 💸 ดอกเบี้ย: **${(recScenario?.totalInterest || 0).toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}**\n` +
-        `├ 💰 ประหยัดกว่าขั้นต่ำ: **${((minScenario?.totalInterest || 0) - (recScenario?.totalInterest || 0)).toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}** ✅\n` +
-        `└ ✨ **สมดุลระหว่างงบประมาณกับการประหยัดดอกเบี้ย**\n\n` +
-        `🏆 **${t('advisor.idealPayment')}: ${ideal.toLocaleString()} ${t('common.currency')}** (10% ของยอดหนี้)\n` +
-        `├ ⏱️ ใช้เวลา: **${idealScenario?.months} ${t('common.months')}** (${idealYears} ปี) ⚡ เร็วสุด!\n` +
-        `├ 💸 ดอกเบี้ย: **${(idealScenario?.totalInterest || 0).toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}** 🎯 ต่ำสุด!\n` +
-        `├ 💰 ประหยัดกว่าขั้นต่ำ: **${((minScenario?.totalInterest || 0) - (idealScenario?.totalInterest || 0)).toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}** 🏆\n` +
-        `└ 🌟 **คุ้มค่าที่สุด! แนะนำสูงสุด!**\n\n` +
-        `🎯 **สรุป:** ถ้าทำได้ให้จ่าย **${ideal.toLocaleString()} ${t('common.currency')}** จะประหยัดได้สูงสุด! 💪`
-      );
-      setComparison(null);
-      return;
+      return {
+        answer: `💡 คำแนะนำการจ่าย\n\n` +
+          `⚠️ ขั้นต่ำ: ${minPayment.toLocaleString()} บาท\n` +
+          `  → ${getMonths(minScenario)} เดือน | ดอกเบี้ย ${getInterest(minScenario)}\n\n` +
+          `👍 แนะนำ: ${recommended.toLocaleString()} บาท\n` +
+          `  → ${getMonths(recScenario)} เดือน | ดอกเบี้ย ${getInterest(recScenario)}\n\n` +
+          `🏆 ดีที่สุด: ${ideal.toLocaleString()} บาท\n` +
+          `  → ${getMonths(idealScenario)} เดือน | ดอกเบี้ย ${getInterest(idealScenario)}\n\n` +
+          `🎯 สรุป: ถ้าทำได้ ให้จ่าย ${ideal.toLocaleString()} บาท จะประหยัดที่สุด!`
+      };
     }
     
     // Case 3: ถามว่าปิดเมื่อไหร่
-    if (q.includes('เมื่อไหร่') || q.includes('กี่เดือน') || q.includes('นานแค่ไหน') || q.includes('when') || q.includes('how long')) {
+    if (q.includes('เมื่อไหร่') || q.includes('กี่เดือน') || q.includes('when') || q.includes('how long') || q.includes('ปิด')) {
       const current = calculateScenario(currentPayment);
-      if (!current || 'error' in current) {
-        setAnswer(`⚠️ ${t('advisor.answer.tooLow') || 'Payment too low'}`);
-        return;
+      
+      if ('error' in current) {
+        return { 
+          answer: `⚠️ ยอดจ่าย ${currentPayment.toLocaleString()} บาท ต่ำเกินไป!\n\nต้องจ่ายอย่างน้อย ${Math.ceil(current.minPayment).toLocaleString()} บาท/เดือน เพื่อให้หนี้ลดลงได้` 
+        };
       }
       
       const years = Math.floor(current.months / 12);
       const months = current.months % 12;
       
-      setAnswer(
-        `💡 **Result:**\n\n` +
-        `${t('advisor.payment')} **${currentPayment.toLocaleString()} ${t('common.currency')}**\n` +
-        `${t('credit.monthsToPayOff')}: **${current.months} ${t('common.months')}** ${years > 0 ? `(${years} ${t('common.years')} ${months} ${t('common.months')})` : ''}\n\n` +
-        `💰 ${t('credit.totalInterest')}: ${current.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}\n` +
-        `💵 ${t('credit.totalPaid')}: ${current.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} ${t('common.currency')}`
-      );
-      setComparison(null);
-      return;
+      return {
+        answer: `⏱️ ถ้าจ่าย ${currentPayment.toLocaleString()} บาท/เดือน\n\n` +
+          `📅 หนี้หมดใน: ${current.months} เดือน ${years > 0 ? `(${years} ปี ${months} เดือน)` : ''}\n` +
+          `💸 ดอกเบี้ยรวม: ${current.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n` +
+          `💰 จ่ายทั้งหมด: ${current.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท`
+      };
     }
     
-    // Default: แนะนำการใช้
-    setAnswer(
-      `💬 **${t('advisor.title')}**\n\n` +
-      `${t('advisor.quickQuestions')}\n` +
-      `• "2000 vs 3000"\n` +
-      `• "How much should I pay?"\n` +
-      `• "When will I be debt free?"`
-    );
-    setComparison(null);
+    // Case 4: ถ้ามีตัวเลขเดียว ให้คำนวณตัวนั้น
+    if (numbers.length === 1) {
+      const payment = numbers[0];
+      const scenario = calculateScenario(payment);
+      
+      if ('error' in scenario) {
+        return { 
+          answer: `⚠️ จ่าย ${payment.toLocaleString()} บาท น้อยเกินไป!\n\nดอกเบี้ยต่อเดือน ~${Math.ceil(scenario.minPayment).toLocaleString()} บาท\nต้องจ่ายมากกว่านี้ถึงจะลดหนี้ได้` 
+        };
+      }
+      
+      const years = Math.floor(scenario.months / 12);
+      
+      return {
+        answer: `📊 ถ้าจ่าย ${payment.toLocaleString()} บาท/เดือน\n\n` +
+          `⏱️ หนี้หมดใน: ${scenario.months} เดือน (${years} ปี)\n` +
+          `💸 ดอกเบี้ย: ${scenario.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท\n` +
+          `💰 จ่ายทั้งหมด: ${scenario.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} บาท`
+      };
+    }
+    
+    // Default
+    return {
+      answer: `💬 ถามอะไรก็ได้!\n\nลองพิมพ์:\n• "3000 vs 5000"\n• "ควรจ่ายเท่าไหร่"\n• "จะปิดหนี้เมื่อไหร่"\n• หรือใส่ตัวเลข เช่น "4000"`
+    };
+  };
+
+  // Handle sending message
+  const handleSend = (text?: string) => {
+    const messageText = text || inputValue.trim();
+    if (!messageText) return;
+    
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: messageText,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+    
+    // Simulate AI thinking
+    setTimeout(() => {
+      const result = analyzeQuestion(messageText);
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: result.answer,
+        comparison: result.comparison,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 500);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (question.trim()) {
-      analyzeQuestion();
-    }
+    handleSend();
   };
 
-  const quickQuestions = [
-    `🤔 ถ้าจ่ายเพิ่มขึ้นเป็น ${Math.ceil(currentPayment * 1.5).toLocaleString()} บาท จะดีไหม?`,
-    `💡 ควรจ่ายเท่าไหร่ดี? แนะนำหน่อย`,
-    `⏱️ จะปิดหนี้เมื่อไหร่ ถ้าจ่าย ${currentPayment.toLocaleString()} บาท?`,
-    `📊 เปรียบเทียบ ${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()} บาท`
+  // Quick questions in Thai
+  const quickQuestions = language === 'th' ? [
+    `ถ้าจ่าย ${Math.ceil(currentPayment * 1.5).toLocaleString()} จะดีไหม?`,
+    `ควรจ่ายเท่าไหร่ดี?`,
+    `จะปิดหนี้ได้เมื่อไหร่?`,
+    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`
+  ] : [
+    `What if I pay ${Math.ceil(currentPayment * 1.5).toLocaleString()}?`,
+    `How much should I pay?`,
+    `When will I be debt free?`,
+    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`
   ];
+
+  const handleClearChat = () => {
+    setMessages([]);
+  };
 
   return (
     <div className="relative">
@@ -224,143 +252,140 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
       </button>
 
       {/* Chat Panel */}
-      {isOpen && (
-        <div className="fixed bottom-36 sm:bottom-24 right-2 sm:right-6 left-2 sm:left-auto w-auto sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 max-h-[60vh] sm:max-h-[600px] flex flex-col animate-fade-in overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex items-center justify-between shadow-md">
-            <div className="flex items-center space-x-2">
-              <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
-                <Sparkles className="w-5 h-5" />
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            className="fixed bottom-36 sm:bottom-24 right-2 sm:right-6 left-2 sm:left-auto w-auto sm:w-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 max-h-[70vh] sm:max-h-[600px] flex flex-col overflow-hidden"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 flex items-center justify-between shadow-md flex-shrink-0">
+              <div className="flex items-center space-x-2">
+                <div className="p-1.5 bg-white/20 rounded-lg backdrop-blur-sm">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base">{language === 'th' ? 'AI ที่ปรึกษาหนี้' : 'AI Debt Advisor'}</h3>
+                  <p className="text-xs text-purple-100 opacity-90">{language === 'th' ? 'ถามได้เลย!' : 'Ask me anything!'}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-base">{t('advisor.headerTitle')}</h3>
-                <p className="text-xs text-purple-100 opacity-90">{t('advisor.headerSubtitle')}</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => setIsOpen(false)} 
-              className="p-1 hover:bg-white/20 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* Current Info */}
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg text-sm">
-              <p className="font-semibold text-purple-900 dark:text-purple-200 mb-1">📊 {t('advisor.currentInfo')}</p>
-              <p className="text-purple-700 dark:text-purple-300">💰 {t('advisor.balance')}: {balance.toLocaleString()} {t('common.currency')}</p>
-              <p className="text-purple-700 dark:text-purple-300">📈 {t('advisor.interest')}: {apr}% {t('advisor.perYear')}</p>
-              <p className="text-purple-700 dark:text-purple-300">💳 {t('advisor.payment')}: {currentPayment.toLocaleString()} {t('common.currency')}</p>
-            </div>
-
-            {/* Quick Questions */}
-            {!answer && (
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">💡 {t('advisor.quickQuestions')}</p>
-                {quickQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setQuestion(q); setTimeout(() => analyzeQuestion(), 100); }}
-                    className="w-full text-left text-sm p-2 bg-gray-50 dark:bg-gray-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 text-gray-800 dark:text-gray-200"
+              <div className="flex items-center gap-2">
+                {messages.length > 0 && (
+                  <button 
+                    onClick={handleClearChat}
+                    className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                    title={language === 'th' ? 'ล้างแชท' : 'Clear chat'}
                   >
-                    {q}
+                    <RotateCcw className="w-4 h-4" />
                   </button>
-                ))}
+                )}
+                <button 
+                  onClick={() => setIsOpen(false)} 
+                  className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            )}
-
-            {/* Answer */}
-            {answer && (
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border-2 border-purple-200 dark:border-purple-700">
-                <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-200 whitespace-pre-line">
-                  {answer}
-                </div>
-              </div>
-            )}
-
-            {/* Comparison Table */}
-            {comparison && (
-              <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-lg overflow-hidden">
-                <div className="bg-purple-100 dark:bg-purple-900/30 p-3">
-                  <h4 className="font-bold text-purple-900 dark:text-purple-200 flex items-center">
-                    <Calculator className="w-4 h-4 mr-2" />
-                    {t('advisor.comparisonTitle')}
-                  </h4>
-                </div>
-                <div className="p-3 space-y-3">
-                  {/* Scenario 1 */}
-                  <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
-                    <p className="font-semibold text-red-900 dark:text-red-300 mb-2">
-                      📊 {t('advisor.scenario1')}: {comparison.scenario1.payment.toLocaleString()} {t('common.currency')}
-                    </p>
-                    <div className="text-sm text-red-800 dark:text-red-300 space-y-1">
-                      <p>⏱️ {t('dashboard.duration')}: {comparison.scenario1.months} {t('common.months')}</p>
-                      <p>💸 {t('advisor.interest')}: {comparison.scenario1.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} {t('common.currency')}</p>
-                      <p>💰 {t('credit.totalPaid')}: {comparison.scenario1.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} {t('common.currency')}</p>
-                    </div>
-                  </div>
-
-                  {/* Scenario 2 */}
-                  <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
-                    <p className="font-semibold text-green-900 dark:text-green-300 mb-2">
-                      ✅ {t('advisor.scenario2')}: {comparison.scenario2.payment.toLocaleString()} {t('common.currency')}
-                    </p>
-                    <div className="text-sm text-green-800 dark:text-green-300 space-y-1">
-                      <p>⏱️ {t('dashboard.duration')}: {comparison.scenario2.months} {t('common.months')}</p>
-                      <p>💸 {t('advisor.interest')}: {comparison.scenario2.totalInterest.toLocaleString('th-TH', {maximumFractionDigits: 0})} {t('common.currency')}</p>
-                      <p>💰 {t('credit.totalPaid')}: {comparison.scenario2.totalPaid.toLocaleString('th-TH', {maximumFractionDigits: 0})} {t('common.currency')}</p>
-                    </div>
-                  </div>
-
-                  {/* Savings */}
-                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-3 rounded-lg border-2 border-yellow-300 dark:border-yellow-700">
-                    <p className="font-bold text-orange-900 dark:text-orange-300 mb-2 flex items-center">
-                      <TrendingDown className="w-4 h-4 mr-1" />
-                      {t('advisor.savings')}
-                    </p>
-                    <div className="text-sm text-orange-800 dark:text-orange-300 space-y-1 font-semibold">
-                      <p>⚡ {t('advisor.faster')}: {comparison.savings.months} {t('common.months')}</p>
-                      <p>💰 {t('advisor.saveMoney')}: {comparison.savings.total.toLocaleString('th-TH', {maximumFractionDigits: 0})} {t('common.currency')}</p>
-                      <p>📉 {t('advisor.reduceInterest')}: {comparison.savings.percentage.toFixed(1)}%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Input Form */}
-          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder={t('advisor.inputPlaceholder')}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all"
-                aria-label={t('advisor.send')}
-              >
-                <Send className="w-5 h-5" />
-              </button>
             </div>
-            {answer && (
-              <button
-                type="button"
-                onClick={() => { setQuestion(''); setAnswer(null); setComparison(null); }}
-                className="mt-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300"
-              >
-                🔄 {t('advisor.newQuestion')}
-              </button>
-            )}
-          </form>
-        </div>
-      )}
+
+            {/* Current Info Bar */}
+            <div className="bg-purple-50 dark:bg-purple-900/30 px-4 py-2 text-xs flex-shrink-0 border-b border-purple-100 dark:border-purple-800">
+              <span className="text-purple-700 dark:text-purple-300">
+                💰 {balance.toLocaleString()} บาท | 📈 {apr}% | 💳 {currentPayment.toLocaleString()} บาท/เดือน
+              </span>
+            </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[200px]">
+              {messages.length === 0 ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+                    {language === 'th' ? '💡 กดคำถามด้านล่างหรือพิมพ์เอง' : '💡 Tap a question or type your own'}
+                  </p>
+                  {quickQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(q)}
+                      className="w-full text-left text-sm p-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl transition-colors border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 text-gray-700 dark:text-gray-200"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex items-start gap-2 max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
+                          msg.type === 'user' 
+                            ? 'bg-emerald-500 text-white' 
+                            : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
+                        }`}>
+                          {msg.type === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                        </div>
+                        <div className={`rounded-2xl px-4 py-3 ${
+                          msg.type === 'user'
+                            ? 'bg-emerald-500 text-white rounded-br-md'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-md'
+                        }`}>
+                          <div className="text-sm whitespace-pre-line leading-relaxed">
+                            {msg.content}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {isTyping && (
+                    <div className="flex justify-start">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                          <Bot className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-bl-md px-4 py-3">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
+            </div>
+
+            {/* Input Form */}
+            <form onSubmit={handleSubmit} className="p-3 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white dark:bg-gray-800">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={language === 'th' ? 'พิมพ์คำถาม เช่น "3000 vs 5000"' : 'Type a question...'}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                />
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim()}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
