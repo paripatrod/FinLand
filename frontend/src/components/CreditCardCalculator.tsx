@@ -643,7 +643,7 @@ export default function CreditCardCalculator() {
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
+                      <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">{t('ai.v4.title')}</h3>
                       <p className="text-[10px] text-gray-500">v{aiAnalysis.version}</p>
                     </div>
                   </div>
@@ -654,9 +654,9 @@ export default function CreditCardCalculator() {
                     aiAnalysis.insights?.severity === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
                     'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
                   }`}>
-                    {aiAnalysis.insights?.severity === 'critical' ? '🚨 วิกฤต' :
-                     aiAnalysis.insights?.severity === 'high' ? '⚠️ เสี่ยงสูง' :
-                     aiAnalysis.insights?.severity === 'medium' ? '📊 ปานกลาง' : '✅ ปลอดภัย'}
+                    {aiAnalysis.insights?.severity === 'critical' ? t('ai.v4.riskCritical') :
+                     aiAnalysis.insights?.severity === 'high' ? t('ai.v4.riskHigh') :
+                     aiAnalysis.insights?.severity === 'medium' ? t('ai.v4.riskMedium') : t('ai.v4.riskLow')}
                   </div>
                 </div>
 
@@ -664,7 +664,7 @@ export default function CreditCardCalculator() {
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-500">❤️ สุขภาพการเงิน</span>
+                      <span className="text-xs text-gray-500">{t('ai.v4.healthScore')}</span>
                       <span className={`text-xl font-bold ${
                         (aiAnalysis.financial_health?.health_score ?? 0) >= 70 ? 'text-emerald-600' :
                         (aiAnalysis.financial_health?.health_score ?? 0) >= 50 ? 'text-yellow-600' : 'text-red-600'
@@ -679,7 +679,7 @@ export default function CreditCardCalculator() {
                   </div>
                   <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-gray-500">⚡ ระดับความเสี่ยง</span>
+                      <span className="text-xs text-gray-500">{t('ai.v4.riskLevel')}</span>
                       <span className={`text-xl font-bold ${
                         (aiAnalysis.insights?.risk_score ?? 0) >= 70 ? 'text-red-600' :
                         (aiAnalysis.insights?.risk_score ?? 0) >= 50 ? 'text-orange-600' :
@@ -701,9 +701,9 @@ export default function CreditCardCalculator() {
                   <div className="text-center p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg relative">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {extraPayment > 0 && whatIfResult ? whatIfResult.months : result?.months || aiAnalysis.debt_analysis?.debt_freedom_months}
-                      <span className="text-xs text-gray-500 ml-1">เดือน</span>
+                      <span className="text-xs text-gray-500 ml-1">{t('ai.v4.months')}</span>
                     </div>
-                    <div className="text-xs text-gray-600">ปลดหนี้</div>
+                    <div className="text-xs text-gray-600">{t('ai.v4.debtFreedom')}</div>
                     {extraPayment > 0 && whatIfResult && whatIfResult.savedMonths > 0 && (
                       <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full">-{whatIfResult.savedMonths}</div>
                     )}
@@ -712,7 +712,7 @@ export default function CreditCardCalculator() {
                     <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                       +{formatCurrency(extraPayment > 0 ? extraPayment : aiAnalysis.debt_analysis?.smart_payment_boost)}
                     </div>
-                    <div className="text-xs text-gray-600">{extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม'}</div>
+                    <div className="text-xs text-gray-600">{extraPayment > 0 ? t('ai.v4.extraPaymentWhatIf') : t('ai.v4.recommendedExtra')}</div>
                   </div>
                 </div>
 
@@ -720,7 +720,7 @@ export default function CreditCardCalculator() {
                 {extraPayment > 0 && whatIfResult && (
                   <div className="p-3 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg border border-emerald-300 dark:border-emerald-600 mb-3">
                     <div className="text-sm text-emerald-800 dark:text-emerald-200">
-                      🎯 <b>What-If:</b> เร็วขึ้น <b>{whatIfResult.savedMonths}</b> เดือน ประหยัด <b>{formatCurrency(whatIfResult.savedInterest)}</b> บาท
+                      {t('ai.v4.whatIfResult')} {t('ai.v4.fasterBy')} <b>{whatIfResult.savedMonths}</b> {t('ai.v4.months')} {t('ai.v4.saveAmount')} <b>{formatCurrency(whatIfResult.savedInterest)}</b>
                     </div>
                   </div>
                 )}
@@ -728,7 +728,7 @@ export default function CreditCardCalculator() {
                 {/* 📊 Personalized Tips Section */}
                 {aiAnalysis.insights?.tips && aiAnalysis.insights.tips.length > 0 && (
                   <div className="mb-3 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg">
-                    <div className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">📊 วิเคราะห์จากข้อมูลของคุณ</div>
+                    <div className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">{t('ai.v4.personalizedTips')}</div>
                     <div className="space-y-1.5">
                       {aiAnalysis.insights.tips.map((tip: string, i: number) => (
                         <div key={i} className="text-sm text-gray-700 dark:text-gray-300">{tip}</div>
@@ -740,7 +740,7 @@ export default function CreditCardCalculator() {
                 {/* 💡 Action Cards */}
                 {aiAnalysis.insights?.actions && aiAnalysis.insights.actions.length > 0 && (
                   <div className="mb-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg border border-amber-200 dark:border-amber-700">
-                    <div className="text-xs font-bold text-amber-800 dark:text-amber-200 mb-2">💡 สิ่งที่ควรทำ</div>
+                    <div className="text-xs font-bold text-amber-800 dark:text-amber-200 mb-2">{t('ai.v4.actionTips')}</div>
                     <div className="space-y-1.5">
                       {aiAnalysis.insights.actions.map((action: string, i: number) => (
                         <div key={i} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
@@ -755,11 +755,11 @@ export default function CreditCardCalculator() {
                 {/* Strategy Row */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="text-xs text-gray-500 mb-1">🎯 กลยุทธ์</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('ai.v4.strategy')}</div>
                     <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
                   </div>
                   <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
-                    <div className="text-xs text-gray-500 mb-1">⭐ Action</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('ai.v4.primaryAction')}</div>
                     <div className="font-semibold text-sm text-purple-700 dark:text-purple-300">{aiAnalysis.strategy?.primary_action}</div>
                   </div>
                 </div>
@@ -767,7 +767,7 @@ export default function CreditCardCalculator() {
                 {/* Emergency Fund */}
                 {(aiAnalysis.planning?.emergency_buffer_months ?? 0) > 0 && (
                   <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-700 dark:text-blue-300">
-                    🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
+                    {t('ai.v4.emergencyFund')} <b>{aiAnalysis.planning?.emergency_buffer_months}</b> {t('ai.v4.months')}
                   </div>
                 )}
               </div>

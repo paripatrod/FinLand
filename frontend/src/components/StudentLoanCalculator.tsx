@@ -610,7 +610,7 @@ export default function StudentLoanCalculator() {
                     <div className="p-2 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน v4.0</h3>
+                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">{t('ai.v4.title')}</h3>
                   </div>
                   {/* Health Score + Risk */}
                   <div className="flex items-center gap-2">
@@ -637,17 +637,17 @@ export default function StudentLoanCalculator() {
                 {aiAnalysis.personalized_insights && (
                   <div className="mb-4 p-3 bg-white/70 dark:bg-gray-800/70 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">📊 Risk Meter</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('ai.v4.riskMeter')}</span>
                       <span className={`text-sm font-bold ${
                         aiAnalysis.personalized_insights.risk_level === 'low' ? 'text-emerald-600' :
                         aiAnalysis.personalized_insights.risk_level === 'medium' ? 'text-yellow-600' :
                         aiAnalysis.personalized_insights.risk_level === 'high' ? 'text-orange-600' :
                         'text-red-600'
                       }`}>
-                        {aiAnalysis.personalized_insights.risk_level === 'low' ? '🟢 ความเสี่ยงต่ำ' :
-                         aiAnalysis.personalized_insights.risk_level === 'medium' ? '🟡 ความเสี่ยงปานกลาง' :
-                         aiAnalysis.personalized_insights.risk_level === 'high' ? '🟠 ความเสี่ยงสูง' :
-                         '🔴 ความเสี่ยงวิกฤต'}
+                        {aiAnalysis.personalized_insights.risk_level === 'low' ? t('ai.v4.riskLow') :
+                         aiAnalysis.personalized_insights.risk_level === 'medium' ? t('ai.v4.riskMedium') :
+                         aiAnalysis.personalized_insights.risk_level === 'high' ? t('ai.v4.riskHigh') :
+                         t('ai.v4.riskCritical')}
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
@@ -669,9 +669,9 @@ export default function StudentLoanCalculator() {
                   <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {extraPayment > 0 && whatIfResult ? whatIfResult.months : (Number(years) * 12) || aiAnalysis.debt_analysis?.debt_freedom_months}
-                      <span className="text-xs text-gray-500 ml-1">เดือน</span>
+                      <span className="text-xs text-gray-500 ml-1">{t('ai.v4.months')}</span>
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">ปลดหนี้ กยศ.</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{t('ai.v4.debtFreedomStudent')}</div>
                     {extraPayment > 0 && whatIfResult && whatIfResult.savedMonths > 0 && (
                       <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full">-{whatIfResult.savedMonths}</div>
                     )}
@@ -680,25 +680,25 @@ export default function StudentLoanCalculator() {
                     <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                       +{formatCurrency(extraPayment > 0 ? extraPayment : aiAnalysis.debt_analysis?.smart_payment_boost)}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">{extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม/เดือน'}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{extraPayment > 0 ? t('ai.v4.extraPaymentWhatIf') : t('ai.v4.recommendedExtraMonth')}</div>
                   </div>
                 </div>
 
                 {/* What-If or Tip */}
                 {extraPayment > 0 && whatIfResult ? (
                   <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700 mb-3">
-                    <div className="text-sm text-emerald-700 dark:text-emerald-300">🎯 <b>What-If:</b> เร็วขึ้น <b className="text-emerald-600">{whatIfResult.savedMonths}</b> เดือน ประหยัด <b className="text-emerald-600">{formatCurrency(whatIfResult.savedInterest)}</b></div>
+                    <div className="text-sm text-emerald-700 dark:text-emerald-300">{t('ai.v4.whatIfResult')} {t('ai.v4.fasterBy')} <b className="text-emerald-600">{whatIfResult.savedMonths}</b> {t('ai.v4.months')} {t('ai.v4.saveAmount')} <b className="text-emerald-600">{formatCurrency(whatIfResult.savedInterest)}</b></div>
                   </div>
                 ) : (aiAnalysis.debt_analysis?.smart_payment_boost ?? 0) > 0 && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-3">
-                    <div className="text-sm text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
+                    <div className="text-sm text-amber-700 dark:text-amber-300">{t('ai.v4.payMoreTip')} <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> {t('ai.v4.months')} {t('ai.v4.saveTip')} <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
                   </div>
                 )}
 
                 {/* Personalized Tips - NEW v4.0 */}
                 {aiAnalysis.personalized_insights?.smart_tips && aiAnalysis.personalized_insights.smart_tips.length > 0 && (
                   <div className="mb-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
-                    <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">💡 คำแนะนำเฉพาะคุณ:</div>
+                    <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">{t('ai.v4.personalizedTipsFor')}</div>
                     <ul className="space-y-1">
                       {aiAnalysis.personalized_insights.smart_tips.slice(0, 3).map((tip: string, i: number) => (
                         <li key={i} className="text-sm text-purple-600 dark:text-purple-400 flex items-start gap-2">
@@ -718,7 +718,7 @@ export default function StudentLoanCalculator() {
                         aiAnalysis.personalized_insights.dti_analysis.status === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700' :
                         'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
                       }`}>
-                        <div className="text-xs text-gray-500 mb-1">📊 DTI Ratio</div>
+                        <div className="text-xs text-gray-500 mb-1">{t('ai.v4.dtiRatio')}</div>
                         <div className={`text-lg font-bold ${
                           aiAnalysis.personalized_insights.dti_analysis.status === 'healthy' ? 'text-emerald-600 dark:text-emerald-400' :
                           aiAnalysis.personalized_insights.dti_analysis.status === 'warning' ? 'text-yellow-600 dark:text-yellow-400' :
@@ -733,7 +733,7 @@ export default function StudentLoanCalculator() {
                         aiAnalysis.personalized_insights.interest_analysis.level === 'medium' ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700' :
                         'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
                       }`}>
-                        <div className="text-xs text-gray-500 mb-1">💰 ดอกเบี้ย</div>
+                        <div className="text-xs text-gray-500 mb-1">{t('ai.v4.interest')}</div>
                         <div className={`text-lg font-bold ${
                           aiAnalysis.personalized_insights.interest_analysis.level === 'low' ? 'text-emerald-600 dark:text-emerald-400' :
                           aiAnalysis.personalized_insights.interest_analysis.level === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
@@ -748,7 +748,7 @@ export default function StudentLoanCalculator() {
                 {/* Action Cards - NEW v4.0 */}
                 {aiAnalysis.personalized_insights?.action_cards && aiAnalysis.personalized_insights.action_cards.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">🎯 Actions:</div>
+                    <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">{t('ai.v4.actions')}</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {aiAnalysis.personalized_insights.action_cards.map((action: any, i: number) => (
                         <div key={i} className={`p-2.5 rounded-lg border flex items-center gap-2 ${
@@ -770,11 +770,11 @@ export default function StudentLoanCalculator() {
                 {/* Strategy Row */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="text-xs text-gray-500 mb-1">🎯 กลยุทธ์แนะนำ</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('ai.v4.strategyRecommended')}</div>
                     <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
                   </div>
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
-                    <div className="text-xs text-gray-500 mb-1">⭐ สิ่งที่ควรทำก่อน</div>
+                    <div className="text-xs text-gray-500 mb-1">{t('ai.v4.primaryActionFirst')}</div>
                     <div className="font-semibold text-sm text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
                   </div>
                 </div>
@@ -782,7 +782,7 @@ export default function StudentLoanCalculator() {
                 {/* Emergency Fund */}
                 {(aiAnalysis.planning?.emergency_buffer_months ?? 0) > 0 && (
                   <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-700 dark:text-blue-300">
-                    🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
+                    {t('ai.v4.emergencyFund')} <b>{aiAnalysis.planning?.emergency_buffer_months}</b> {t('ai.v4.months')}
                   </div>
                 )}
               </div>
