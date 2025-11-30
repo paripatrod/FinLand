@@ -78,7 +78,8 @@ export default function Dashboard() {
     })
   }
 
-  function formatCurrency(value: number) {
+  function formatCurrency(value: number | undefined) {
+    if (value === undefined || value === null) return '0.00'
     return value.toLocaleString('th-TH', { minimumFractionDigits: 2 })
   }
 
@@ -267,22 +268,22 @@ function CalculationCard({ calculation, onDelete, formatDate, formatCurrency }: 
               <InfoItem
                 icon={<DollarSign className="w-4 h-4" />}
                 label={t('dashboard.balance')}
-                value={`${formatCurrency(calculation.data.balance)} ${t('common.currency')}`}
+                value={`${formatCurrency(calculation.data?.balance)} ${t('common.currency')}`}
               />
               <InfoItem
                 icon={<TrendingUp className="w-4 h-4" />}
                 label={t('dashboard.apr')}
-                value={`${calculation.data.apr}%`}
+                value={`${calculation.data?.apr ?? 0}%`}
               />
               <InfoItem
                 icon={<DollarSign className="w-4 h-4" />}
                 label={t('dashboard.monthlyPayment')}
-                value={`${formatCurrency(calculation.data.monthly_payment)} ${t('common.currency')}`}
+                value={`${formatCurrency(calculation.data?.monthly_payment)} ${t('common.currency')}`}
               />
               <InfoItem
                 icon={<Calendar className="w-4 h-4" />}
                 label={t('dashboard.duration')}
-                value={`${calculation.result.months} ${t('dashboard.months')}`}
+                value={`${calculation.result?.months ?? 0} ${t('dashboard.months')}`}
                 highlight
               />
             </>
@@ -291,22 +292,22 @@ function CalculationCard({ calculation, onDelete, formatDate, formatCurrency }: 
               <InfoItem
                 icon={<DollarSign className="w-4 h-4" />}
                 label={t('dashboard.loanAmount')}
-                value={`${formatCurrency(calculation.data.loan_amount)} ${t('common.currency')}`}
+                value={`${formatCurrency(calculation.data?.loan_amount)} ${t('common.currency')}`}
               />
               <InfoItem
                 icon={<TrendingUp className="w-4 h-4" />}
                 label={t('dashboard.apr')}
-                value={`${calculation.data.interest_rate}%`}
+                value={`${calculation.data?.interest_rate ?? 0}%`}
               />
               <InfoItem
                 icon={<Calendar className="w-4 h-4" />}
                 label={t('dashboard.duration')}
-                value={`${calculation.data.term_months} ${t('dashboard.months')}`}
+                value={`${calculation.data?.term_months ?? 0} ${t('dashboard.months')}`}
               />
               <InfoItem
                 icon={<DollarSign className="w-4 h-4" />}
                 label={t('dashboard.monthlyPayment')}
-                value={`${formatCurrency(calculation.result.monthly_payment)} ${t('common.currency')}`}
+                value={`${formatCurrency(calculation.result?.monthly_payment)} ${t('common.currency')}`}
                 highlight
               />
             </>
@@ -317,13 +318,13 @@ function CalculationCard({ calculation, onDelete, formatDate, formatCurrency }: 
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.totalPaid')}</div>
             <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(calculation.result.total_paid)} {t('common.currency')}
+              {formatCurrency(calculation.result?.total_paid)} {t('common.currency')}
             </div>
           </div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('dashboard.totalInterest')}</div>
             <div className="text-base sm:text-lg font-bold text-red-600 dark:text-red-400">
-              {formatCurrency(calculation.result.total_interest)} {t('common.currency')}
+              {formatCurrency(calculation.result?.total_interest)} {t('common.currency')}
             </div>
           </div>
         </div>

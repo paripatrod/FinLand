@@ -16,19 +16,19 @@ export default function DashboardAnalytics({ calculations }: DashboardAnalyticsP
     const studentLoanCalcs = calculations.filter(c => c.type === 'student-loan')
 
     const totalDebt = calculations.reduce((sum, c) => {
-      return sum + (c.data.balance || c.data.loan_amount || 0)
+      return sum + (c.data?.balance || c.data?.loan_amount || 0)
     }, 0)
 
     const totalInterest = calculations.reduce((sum, c) => {
-      return sum + (c.result.total_interest || 0)
+      return sum + (c.result?.total_interest || 0)
     }, 0)
 
     const avgAPR = calculations.length > 0
-      ? calculations.reduce((sum, c) => sum + (c.data.apr || c.data.interest_rate || 0), 0) / calculations.length
+      ? calculations.reduce((sum, c) => sum + (c.data?.apr || c.data?.interest_rate || 0), 0) / calculations.length
       : 0
 
     const avgMonths = calculations.length > 0
-      ? calculations.reduce((sum, c) => sum + (c.result.months || c.data.term_months || 0), 0) / calculations.length
+      ? calculations.reduce((sum, c) => sum + (c.result?.months || c.data?.term_months || 0), 0) / calculations.length
       : 0
 
     // Monthly trend
@@ -40,7 +40,7 @@ export default function DashboardAnalytics({ calculations }: DashboardAnalyticsP
         acc[monthKey] = { month: monthKey, count: 0, totalDebt: 0 }
       }
       acc[monthKey].count += 1
-      acc[monthKey].totalDebt += (calc.data.balance || calc.data.loan_amount || 0)
+      acc[monthKey].totalDebt += (calc.data?.balance || calc.data?.loan_amount || 0)
       return acc
     }, {} as Record<string, any>)
 
@@ -55,8 +55,8 @@ export default function DashboardAnalytics({ calculations }: DashboardAnalyticsP
     // Interest comparison
     const interestData = calculations.slice(0, 10).map((c, i) => ({
       name: `#${i + 1}`,
-      principal: c.data.balance || c.data.loan_amount || 0,
-      interest: c.result.total_interest || 0
+      principal: c.data?.balance || c.data?.loan_amount || 0,
+      interest: c.result?.total_interest || 0
     }))
 
     return {
