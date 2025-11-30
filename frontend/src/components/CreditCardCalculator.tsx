@@ -625,6 +625,7 @@ export default function CreditCardCalculator() {
           balance={Number(balance)} 
           apr={Number(apr)} 
           currentPayment={Number(monthlyPayment)}
+          monthlyIncome={Number(monthlyIncome) || 0}
         />
       )}
       {/* Sticky Mobile Summary */}

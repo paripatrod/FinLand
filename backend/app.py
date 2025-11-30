@@ -494,8 +494,113 @@ def health():
         "model_loaded": model is not None,
         "model_ready": model_loading_attempted,
         "rate_limit": "enabled",
-        "version": "4.1.0"
+        "version": "4.2.0",
+        "gemini_enabled": bool(os.environ.get('GEMINI_API_KEY'))
     })
+
+# API: AI Chat with Gemini
+@app.route('/api/ai-chat', methods=['POST'])
+@limiter.limit("20 per minute")
+def ai_chat():
+    """AI Chat using Google Gemini for financial advice"""
+    try:
+        gemini_key = os.environ.get('GEMINI_API_KEY')
+        
+        if not gemini_key:
+            return jsonify({
+                "error": "Gemini API not configured",
+                "fallback": True
+            }), 400
+        
+        data = request.json
+        question = sanitize_string(data.get('question', ''))
+        balance = sanitize_number(data.get('balance'), 0, 1e12) or 0
+        apr = sanitize_number(data.get('apr'), 0, 100) or 0
+        payment = sanitize_number(data.get('payment'), 0, 1e12) or 0
+        monthly_income = sanitize_number(data.get('monthly_income'), 0, 1e12) or 0
+        
+        if not question:
+            return jsonify({"error": "Question is required"}), 400
+        
+        # Import and configure Gemini
+        import google.generativeai as genai
+        genai.configure(api_key=gemini_key)
+        
+        # Calculate some useful metrics
+        monthly_rate = apr / 100 / 12
+        monthly_interest = balance * monthly_rate
+        dti_ratio = (payment / monthly_income * 100) if monthly_income > 0 else 0
+        
+        # Estimate payoff time
+        if payment > monthly_interest and balance > 0:
+            months_to_payoff = 0
+            temp_balance = balance
+            while temp_balance > 0.01 and months_to_payoff < 600:
+                interest = temp_balance * monthly_rate
+                principal = payment - interest
+                temp_balance -= principal
+                months_to_payoff += 1
+        else:
+            months_to_payoff = -1  # Cannot pay off
+        
+        prompt = f"""คุณเป็นที่ปรึกษาการเงินส่วนบุคคลที่เชี่ยวชาญเรื่องหนี้บัตรเครดิตและการวางแผนการเงิน
+ชื่อของคุณคือ "AI ที่ปรึกษาหนี้ FinLand"
+
+📊 ข้อมูลทางการเงินของผู้ใช้:
+- ยอดหนี้คงเหลือ: {balance:,.0f} บาท
+- อัตราดอกเบี้ย: {apr}% ต่อปี
+- ดอกเบี้ยต่อเดือน: ~{monthly_interest:,.0f} บาท
+- ยอดผ่อนต่อเดือน: {payment:,.0f} บาท
+- รายได้ต่อเดือน: {monthly_income:,.0f} บาท
+- DTI Ratio: {dti_ratio:.1f}%
+- คาดว่าปิดหนี้ได้ใน: {"ไม่สามารถปิดได้ (จ่ายน้อยกว่าดอกเบี้ย)" if months_to_payoff < 0 else f"{months_to_payoff} เดือน ({months_to_payoff // 12} ปี {months_to_payoff % 12} เดือน)"}
+
+💬 คำถามของผู้ใช้: {question}
+
+📝 กฎการตอบ:
+1. ตอบเป็นภาษาไทยเท่านั้น
+2. ตอบกระชับ ไม่เกิน 200 คำ
+3. ใช้ emoji เพื่อให้อ่านง่าย
+4. ให้คำแนะนำที่ปฏิบัติได้จริง
+5. ถ้าสถานการณ์อันตราย (DTI > 40% หรือจ่ายไม่พอดอกเบี้ย) ให้เตือนชัดเจน
+6. อย่าให้คำแนะนำทางกฎหมายหรือการลงทุนที่ซับซ้อน
+7. ถ้าคำถามไม่เกี่ยวกับการเงิน ให้บอกว่าเชี่ยวชาญเรื่องหนี้และการเงินเท่านั้น"""
+
+        # Use Gemini Pro model
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=500,
+                temperature=0.7,
+            )
+        )
+        
+        answer = response.text
+        
+        return jsonify({
+            "success": True,
+            "answer": answer,
+            "model": "gemini-1.5-flash",
+            "context": {
+                "balance": balance,
+                "apr": apr,
+                "payment": payment,
+                "monthly_interest": round(monthly_interest, 2),
+                "months_to_payoff": months_to_payoff,
+                "dti_ratio": round(dti_ratio, 2)
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ AI Chat error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "error": f"AI error: {str(e)}",
+            "fallback": True
+        }), 500
 
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_DEBUG', '0') == '1'

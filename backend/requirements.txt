@@ -9,3 +9,4 @@ gunicorn
 scikit-learn==1.5.2
 numpy==1.26.4
 bleach==6.1.0
+google-generativeai==0.8.3

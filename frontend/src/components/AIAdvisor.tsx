@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Sparkles, X, Send, User, Bot, RotateCcw } from 'lucide-react';
+import { MessageCircle, Sparkles, X, Send, User, Bot, RotateCcw, Zap } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { apiClient } from '../utils/api';
 import type { ScenarioComparison } from '../types';
 
 interface AIAdvisorProps {
   balance: number;
   apr: number;
   currentPayment: number;
+  monthlyIncome?: number;
 }
 
 interface ChatMessage {
@@ -16,14 +18,16 @@ interface ChatMessage {
   content: string;
   comparison?: ScenarioComparison;
   timestamp: Date;
+  isGemini?: boolean;
 }
 
-export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorProps) {
+export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome = 0 }: AIAdvisorProps) {
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [useGemini, setUseGemini] = useState(true); // Toggle for Gemini AI
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll to bottom when new messages
@@ -188,7 +192,7 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
   };
 
   // Handle sending message
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const messageText = text || inputValue.trim();
     if (!messageText) return;
     
@@ -203,7 +207,45 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
     setInputValue('');
     setIsTyping(true);
     
-    // Simulate AI thinking
+    // Check if it's a simple calculation question (use local)
+    const isSimpleCalc = /^\d/.test(messageText) || 
+                         messageText.includes('vs') || 
+                         messageText.includes('เท่าไหร่') ||
+                         messageText.includes('เมื่อไหร่') ||
+                         messageText.includes('กี่เดือน');
+    
+    // Try Gemini for complex questions, fallback to local
+    if (useGemini && !isSimpleCalc) {
+      try {
+        const response = await apiClient.post('/api/ai-chat', {
+          question: messageText,
+          balance,
+          apr,
+          payment: currentPayment,
+          monthly_income: monthlyIncome
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.answer) {
+          const aiMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'ai',
+            content: data.answer,
+            timestamp: new Date(),
+            isGemini: true
+          };
+          setMessages(prev => [...prev, aiMessage]);
+          setIsTyping(false);
+          return;
+        }
+      } catch (error) {
+        console.log('Gemini unavailable, using local analysis');
+        // Fall through to local analysis
+      }
+    }
+    
+    // Use local analysis (fallback or simple questions)
     setTimeout(() => {
       const result = analyzeQuestion(messageText);
       const aiMessage: ChatMessage = {
@@ -211,11 +253,12 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
         type: 'ai',
         content: result.answer,
         comparison: result.comparison,
-        timestamp: new Date()
+        timestamp: new Date(),
+        isGemini: false
       };
       setMessages(prev => [...prev, aiMessage]);
       setIsTyping(false);
-    }, 500);
+    }, 300);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -225,15 +268,17 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
 
   // Quick questions in Thai
   const quickQuestions = language === 'th' ? [
-    `ถ้าจ่าย ${Math.ceil(currentPayment * 1.5).toLocaleString()} จะดีไหม?`,
     `ควรจ่ายเท่าไหร่ดี?`,
     `จะปิดหนี้ได้เมื่อไหร่?`,
-    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`
+    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`,
+    `มีวิธีลดหนี้เร็วขึ้นไหม?`,
+    `ควรรีไฟแนนซ์ไหม?`
   ] : [
-    `What if I pay ${Math.ceil(currentPayment * 1.5).toLocaleString()}?`,
     `How much should I pay?`,
     `When will I be debt free?`,
-    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`
+    `${currentPayment.toLocaleString()} vs ${Math.ceil(currentPayment * 2).toLocaleString()}`,
+    `How can I pay off faster?`,
+    `Should I refinance?`
   ];
 
   const handleClearChat = () => {
@@ -273,8 +318,13 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base">{language === 'th' ? 'AI ที่ปรึกษาหนี้' : 'AI Debt Advisor'}</h3>
-                  <p className="text-xs text-purple-100 opacity-90">{language === 'th' ? 'ถามได้เลย!' : 'Ask me anything!'}</p>
+                  <h3 className="font-bold text-base flex items-center gap-1.5">
+                    {language === 'th' ? 'AI ที่ปรึกษาหนี้' : 'AI Debt Advisor'}
+                    {useGemini && <Zap className="w-3.5 h-3.5 text-yellow-300" />}
+                  </h3>
+                  <p className="text-xs text-purple-100 opacity-90">
+                    {useGemini ? 'Powered by Gemini ✨' : (language === 'th' ? 'โหมดออฟไลน์' : 'Offline mode')}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

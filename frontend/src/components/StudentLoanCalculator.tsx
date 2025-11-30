@@ -636,6 +636,7 @@ export default function StudentLoanCalculator() {
           balance={Number(principal)} 
           apr={Number(apr)} 
           currentPayment={result.monthly_payment}
+          monthlyIncome={Number(monthlyIncome) || 0}
         />
       )}
       {/* Sticky Mobile Summary */}
