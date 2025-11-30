@@ -192,6 +192,8 @@ class EnterpriseProfilePredictor:
 # Lazy load AI Model (optional) - Load only when first prediction request comes
 model = None
 model_loading_attempted = False
+financial_advisor = None  # New v3.0 model
+advisor_loading_attempted = False
 
 def download_model_from_url():
     """Download model from external URL if not exists locally"""
@@ -206,10 +208,16 @@ def download_model_from_url():
         response = requests.get(model_url, timeout=300)
         response.raise_for_status()
         
-        with open('model.pkl', 'wb') as f:
+        # Determine filename from URL
+        if 'financial_advisor' in model_url:
+            filename = 'financial_advisor_model.pkl'
+        else:
+            filename = 'model.pkl'
+        
+        with open(filename, 'wb') as f:
             f.write(response.content)
         
-        print("✅ Model downloaded successfully!")
+        print(f"✅ Model downloaded successfully to {filename}!")
         return True
     except Exception as e:
         print(f"❌ Failed to download model: {e}")
@@ -258,6 +266,36 @@ def get_model():
         
     except Exception as e:
         print(f"❌ Error loading model: {e}")
+        return None
+
+
+def get_financial_advisor():
+    """Lazy load the Financial Advisor v3.0 model"""
+    global financial_advisor, advisor_loading_attempted
+    
+    if advisor_loading_attempted:
+        return financial_advisor
+    
+    advisor_loading_attempted = True
+    
+    # Check if model exists
+    if not os.path.exists('financial_advisor_model.pkl'):
+        print("📦 Financial Advisor model not found locally, checking remote...")
+        model_url = os.getenv('MODEL_URL', '')
+        if model_url and 'financial_advisor' in model_url:
+            download_model_from_url()
+    
+    if not os.path.exists('financial_advisor_model.pkl'):
+        print("⚠️ Financial Advisor v3.0 not available")
+        return None
+    
+    try:
+        print("🧠 Loading Financial Advisor v3.0...")
+        financial_advisor = joblib.load('financial_advisor_model.pkl')
+        print(f"✅ Financial Advisor v3.0 loaded! ({financial_advisor.get('training_samples', 0):,} samples)")
+        return financial_advisor
+    except Exception as e:
+        print(f"❌ Error loading Financial Advisor: {e}")
         return None
 
 # API: Predict Profile
@@ -585,6 +623,173 @@ def calculate_student_loan():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 🧠 FINANCIAL ADVISOR v3.0 - 21 PREDICTIONS AI
+# ═══════════════════════════════════════════════════════════════════════════════
+@app.route('/api/ai-analyze', methods=['POST'])
+@limiter.limit("30 per minute")
+def ai_analyze():
+    """
+    🧠 AI Financial Advisor v3.0 - Comprehensive 21-Dimension Analysis
+    """
+    advisor = get_financial_advisor()
+    
+    if advisor is None:
+        return jsonify({"error": "Financial Advisor model not loaded", "fallback": True}), 500
+    
+    try:
+        import numpy as np
+        data = request.json
+        
+        # Extract inputs
+        loan_amount = float(data.get('loan_amount', 0))
+        interest_rate = float(data.get('interest_rate', 0))
+        term_months = float(data.get('term_months', 60))
+        monthly_income = float(data.get('monthly_income', 0))
+        monthly_payment = float(data.get('monthly_payment', 0))
+        monthly_expenses = float(data.get('monthly_expenses', 0) or monthly_income * 0.5)
+        emergency_months = float(data.get('emergency_months', 0))
+        age = int(data.get('age', 30))
+        job_stability = float(data.get('job_stability', 70))
+        payment_history = float(data.get('payment_history', 80))
+        account_age = int(data.get('account_age', 36))
+        current_savings = float(data.get('current_savings', 0))
+        
+        # Validate
+        if loan_amount <= 0:
+            return jsonify({"error": "กรุณาระบุยอดหนี้"}), 400
+        if monthly_income <= 0:
+            return jsonify({"error": "กรุณาระบุรายได้ต่อเดือน"}), 400
+        
+        # Calculate derived features
+        if monthly_payment <= 0:
+            monthly_rate = interest_rate / 100 / 12
+            if monthly_rate > 0:
+                monthly_payment = loan_amount * monthly_rate / (1 - (1 + monthly_rate) ** (-term_months))
+            else:
+                monthly_payment = loan_amount / term_months
+        
+        dti_ratio = (monthly_payment / monthly_income * 100) if monthly_income > 0 else 100
+        min_payment = monthly_payment  # Simplified
+        effective_rate = ((1 + interest_rate/100/12)**12 - 1) * 100
+        log_loan = np.log1p(loan_amount)
+        log_income = np.log1p(monthly_income)
+        payment_flexibility = monthly_income - monthly_payment - monthly_expenses
+        debt_to_annual = loan_amount / (monthly_income * 12) if monthly_income > 0 else 10
+        payment_to_min = 1.0
+        savings_rate = ((monthly_income - monthly_payment - monthly_expenses) / monthly_income * 100) if monthly_income > 0 else 0
+        years_to_retirement = max(0, 60 - age)
+        
+        # Build feature vector (30 features)
+        features = np.array([[
+            loan_amount, interest_rate, term_months, monthly_income, monthly_payment,
+            dti_ratio, min_payment, monthly_expenses, emergency_months, age,
+            job_stability, payment_history, account_age, current_savings,
+            effective_rate, log_loan, log_income, payment_flexibility,
+            debt_to_annual, payment_to_min, savings_rate, years_to_retirement,
+            1 if interest_rate <= 2 else 0,  # is_student_loan
+            1 if 4 <= interest_rate < 15 else 0,  # is_personal_loan
+            1 if 15 <= interest_rate < 20 else 0,  # is_credit_card
+            1 if interest_rate >= 20 else 0,  # is_high_risk
+            1 if age < 30 else 0,  # is_young
+            1 if age >= 50 else 0,  # is_senior
+            1 if emergency_months >= 3 else 0,  # has_emergency_fund
+            1 if monthly_income >= 50000 else 0  # is_high_income
+        ]])
+        
+        # Scale and predict
+        scaler = advisor['scaler']
+        features_scaled = scaler.transform(features)
+        
+        # Regression predictions (16 targets)
+        reg_pred = advisor['regression_model'].predict(features_scaled)[0]
+        
+        # Classification predictions
+        strategy_code = advisor['strategy_model'].predict(features_scaled)[0]
+        action_code = advisor['action_model'].predict(features_scaled)[0]
+        urgency_level = advisor['urgency_model'].predict(features_scaled)[0]
+        support_type = advisor['support_model'].predict(features_scaled)[0]
+        better_than_avg = advisor['better_model'].predict(features_scaled)[0]
+        
+        # Get labels
+        strategy_labels = advisor['strategy_labels']
+        action_labels = advisor['action_labels']
+        urgency_labels = advisor['urgency_labels']
+        support_labels = advisor['support_labels']
+        
+        # Build response
+        response = {
+            "success": True,
+            "version": advisor.get('version', '3.0.0'),
+            "training_samples": advisor.get('training_samples', 0),
+            
+            # Group A: Debt Analysis
+            "debt_analysis": {
+                "debt_freedom_months": round(max(0, reg_pred[0]), 0),
+                "smart_payment_boost": round(max(0, reg_pred[1]), 0),
+                "time_saved_months": round(max(0, reg_pred[2]), 0),
+                "money_saved_total": round(max(0, reg_pred[3]), 0),
+                "interest_burden_ratio": round(max(0, reg_pred[4]), 1)
+            },
+            
+            # Group B: Financial Health
+            "financial_health": {
+                "health_score": round(min(100, max(0, reg_pred[5])), 0),
+                "debt_stress_index": round(min(100, max(0, reg_pred[6])), 0),
+                "stability_score": round(min(100, max(0, reg_pred[7])), 0),
+                "wealth_potential": round(min(100, max(0, reg_pred[8])), 0)
+            },
+            
+            # Group C: Planning
+            "planning": {
+                "emergency_buffer_months": round(max(0, reg_pred[9]), 0),
+                "savings_potential": round(max(0, reg_pred[10]), 0),
+                "investment_readiness": round(min(100, max(0, reg_pred[11])), 0),
+                "retirement_gap_years": round(max(0, reg_pred[12]), 1)
+            },
+            
+            # Group D: Comparison
+            "comparison": {
+                "percentile_rank": round(min(99, max(1, reg_pred[13])), 0),
+                "better_than_average": bool(better_than_avg)
+            },
+            
+            # Group E: Impact
+            "impact": {
+                "credit_score_impact": round(min(50, max(-50, reg_pred[14])), 0),
+                "life_quality_score": round(min(100, max(0, reg_pred[15])), 0)
+            },
+            
+            # Group F: Strategy
+            "strategy": {
+                "payoff_strategy": strategy_labels.get(int(strategy_code), "Standard"),
+                "primary_action": action_labels.get(int(action_code), "รักษาระดับ"),
+                "urgency_level": urgency_labels.get(int(urgency_level), "ปกติ"),
+                "support_needed": support_labels.get(int(support_type), "Self-service")
+            },
+            
+            # Input summary
+            "input_summary": {
+                "loan_amount": loan_amount,
+                "interest_rate": interest_rate,
+                "term_months": term_months,
+                "monthly_income": monthly_income,
+                "monthly_payment": round(monthly_payment, 2),
+                "dti_ratio": round(dti_ratio, 1),
+                "age": age
+            }
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        print(f"❌ AI Analysis error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e), "fallback": True}), 500
+
+
 # Health Check
 @app.route('/api/health', methods=['GET'])
 @limiter.limit("10 per minute")
@@ -593,8 +798,10 @@ def health():
         "status": "healthy",
         "model_loaded": model is not None,
         "model_ready": model_loading_attempted,
+        "financial_advisor_ready": advisor_loading_attempted,
+        "financial_advisor_loaded": financial_advisor is not None,
         "rate_limit": "enabled",
-        "version": "4.2.0",
+        "version": "5.0.0",
         "gemini_enabled": bool(os.environ.get('GEMINI_API_KEY'))
     })
 
