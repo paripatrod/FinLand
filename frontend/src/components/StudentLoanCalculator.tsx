@@ -400,29 +400,44 @@ export default function StudentLoanCalculator() {
                   </div>
 
                   {whatIfResult && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in">
-                       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('whatif.saveInterest')}</div>
-                          <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                            {formatCurrency(whatIfResult.savedInterest)} {t('common.currency')}
+                    <>
+                      {/* Mobile: Compact inline display */}
+                      <div className="sm:hidden bg-white dark:bg-gray-800 p-3 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm animate-fade-in">
+                        <div className="flex justify-between items-center gap-2 text-sm">
+                          <div className="text-center flex-1">
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">💰 -{formatCurrency(whatIfResult.savedInterest)}</span>
                           </div>
-                       </div>
-                       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('whatif.fasterBy')}</div>
-                          <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                            {whatIfResult.savedMonths} {t('common.months')}
+                          <div className="text-gray-300 dark:text-gray-600">|</div>
+                          <div className="text-center flex-1">
+                            <span className="text-blue-600 dark:text-blue-400 font-bold">⏱️ -{whatIfResult.savedMonths} {t('common.months')}</span>
                           </div>
-                          <div className="text-xs text-gray-400">
-                            ({t('table.remaining')} {whatIfResult.months} {t('common.months')})
-                          </div>
-                       </div>
-                       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('credit.totalInterest')}</div>
-                          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                            {formatCurrency(whatIfResult.totalInterest)} {t('common.currency')}
-                          </div>
-                       </div>
-                    </div>
+                        </div>
+                      </div>
+                      {/* Desktop: Full cards */}
+                      <div className="hidden sm:grid sm:grid-cols-3 gap-4 animate-fade-in">
+                         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('whatif.saveInterest')}</div>
+                            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                              {formatCurrency(whatIfResult.savedInterest)} {t('common.currency')}
+                            </div>
+                         </div>
+                         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('whatif.fasterBy')}</div>
+                            <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                              {whatIfResult.savedMonths} {t('common.months')}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              ({t('table.remaining')} {whatIfResult.months} {t('common.months')})
+                            </div>
+                         </div>
+                         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('credit.totalInterest')}</div>
+                            <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                              {formatCurrency(whatIfResult.totalInterest)} {t('common.currency')}
+                            </div>
+                         </div>
+                      </div>
+                    </>
                   )}
                   {extraPayment === 0 && (
                     <p className="text-sm text-gray-500 dark:text-gray-400 text-center italic">
