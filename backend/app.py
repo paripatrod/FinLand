@@ -566,8 +566,8 @@ def ai_chat():
 6. อย่าให้คำแนะนำทางกฎหมายหรือการลงทุนที่ซับซ้อน
 7. ถ้าคำถามไม่เกี่ยวกับการเงิน ให้บอกว่าเชี่ยวชาญเรื่องหนี้และการเงินเท่านั้น"""
 
-        # Use Gemini Pro model
-        model = genai.GenerativeModel('gemini-pro')
+        # Use Gemini 1.5 Flash (Latest stable model)
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         response = model.generate_content(prompt)
         
