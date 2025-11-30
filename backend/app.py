@@ -325,28 +325,111 @@ def predict_profile():
             "risk_score": 50
         }).copy() # Copy to avoid modifying the global dictionary
         
-        # 🧠 AI DTI Analysis (Real-world Logic)
-        if monthly_income > 0 and monthly_payment > 0:
-            dti_ratio = (monthly_payment / monthly_income) * 100
-            result['dti_ratio'] = round(dti_ratio, 2)
-            
+        # ═══════════════════════════════════════════════════════════════════════
+        # 🧠 PERSONALIZED ANALYSIS - Dynamic Tips based on user's actual data
+        # ═══════════════════════════════════════════════════════════════════════
+        
+        # Calculate key metrics
+        monthly_rate = (int_rate / 100) / 12
+        monthly_interest = loan_amnt * monthly_rate
+        total_interest = (monthly_payment * term) - loan_amnt if monthly_payment > 0 else 0
+        years_to_payoff = term / 12
+        
+        # DTI Analysis
+        dti_ratio = (monthly_payment / monthly_income * 100) if monthly_income > 0 else 0
+        result['dti_ratio'] = round(dti_ratio, 2)
+        
+        # Generate PERSONALIZED tip based on actual numbers
+        personalized_tips = []
+        personalized_actions = []
+        
+        # 1. DTI-based advice
+        if monthly_income > 0:
             if dti_ratio > 50:
                 result['severity'] = 'critical'
                 result['risk_score'] = min(99, result.get('risk_score', 50) + 25)
-                result['tip'] = f"🚨 อันตรายมาก! หนี้ก้อนนี้กินเงินเดือนคุณถึง {dti_ratio:.1f}% (ควรต่ำกว่า 30%) " + result['tip']
-                result['action'] = "🆘 หารายได้เพิ่มด่วน! | ลดรายจ่ายทันที | รีไฟแนนซ์"
+                personalized_tips.append(f"🚨 หนี้กินรายได้ถึง {dti_ratio:.0f}% (ควรต่ำกว่า 30%)")
+                personalized_actions.append("หารายได้เสริมด่วน")
             elif dti_ratio > 40:
                 result['severity'] = 'high'
                 result['risk_score'] = min(90, result.get('risk_score', 50) + 15)
-                result['tip'] = f"⚠️ ระวัง! ภาระหนี้ {dti_ratio:.1f}% ของรายได้ ถือว่าหนักมาก " + result['tip']
+                personalized_tips.append(f"⚠️ ภาระหนี้ {dti_ratio:.0f}% ของรายได้ ค่อนข้างหนัก")
+                personalized_actions.append("ลดรายจ่ายที่ไม่จำเป็น")
             elif dti_ratio > 30:
                 result['severity'] = 'medium'
                 result['risk_score'] = min(80, result.get('risk_score', 50) + 10)
-                result['tip'] = f"📝 ภาระหนี้ {dti_ratio:.1f}% ของรายได้ เริ่มตึงมือแล้ว " + result['tip']
-            elif dti_ratio < 10:
-                result['severity'] = 'low'
-                result['risk_score'] = max(5, result.get('risk_score', 50) - 10)
-                result['tip'] = f"✅ สบายมาก! ภาระหนี้แค่ {dti_ratio:.1f}% ของรายได้ " + result['tip']
+                personalized_tips.append(f"📊 ภาระหนี้ {dti_ratio:.0f}% พอรับไหว แต่ควรระวัง")
+            elif dti_ratio > 0:
+                personalized_tips.append(f"✅ ภาระหนี้ {dti_ratio:.0f}% อยู่ในเกณฑ์ดี")
+        
+        # 2. Interest rate advice
+        if int_rate >= 20:
+            personalized_tips.append(f"🔥 ดอกเบี้ย {int_rate}% สูงมาก! เสียดอกเบี้ย ~{monthly_interest:,.0f} บาท/เดือน")
+            personalized_actions.append("หาสินเชื่อดอกต่ำมาปิดด่วน")
+        elif int_rate >= 15:
+            personalized_tips.append(f"💳 ดอกเบี้ย {int_rate}% ระดับบัตรเครดิต ดอกเบี้ย ~{monthly_interest:,.0f} บาท/เดือน")
+            personalized_actions.append("รีไฟแนนซ์หาดอกต่ำกว่า")
+        elif int_rate >= 8:
+            personalized_tips.append(f"📈 ดอกเบี้ย {int_rate}% ปานกลาง")
+            if int_rate > 10:
+                personalized_actions.append("เปรียบเทียบดอกเบี้ยธนาคารอื่น")
+        elif int_rate >= 2:
+            personalized_tips.append(f"👍 ดอกเบี้ย {int_rate}% ถือว่าต่ำ")
+        else:
+            personalized_tips.append(f"✨ ดอกเบี้ย {int_rate}% ต่ำมาก (ระดับ กยศ.)")
+        
+        # 3. Payoff timeline advice
+        if years_to_payoff > 10:
+            personalized_tips.append(f"⏰ ผ่อน {years_to_payoff:.1f} ปี ยาวมาก ดอกเบี้ยสะสม ~{total_interest:,.0f} บาท")
+            personalized_actions.append("พิจารณาเพิ่มยอดจ่ายต่อเดือน")
+        elif years_to_payoff > 5:
+            personalized_tips.append(f"📅 ผ่อน {years_to_payoff:.1f} ปี ({term:.0f} เดือน)")
+        else:
+            personalized_tips.append(f"⚡ ผ่อน {years_to_payoff:.1f} ปี ไม่นานเกินไป")
+        
+        # 4. Payment increase suggestion
+        if monthly_payment > 0 and monthly_income > 0:
+            suggested_increase = monthly_payment * 0.2  # 20% increase
+            new_payment = monthly_payment + suggested_increase
+            
+            # Calculate new payoff time with increased payment
+            if new_payment > monthly_interest:
+                new_months = 0
+                temp_balance = loan_amnt
+                while temp_balance > 0.01 and new_months < 600:
+                    interest = temp_balance * monthly_rate
+                    principal = new_payment - interest
+                    temp_balance -= principal
+                    new_months += 1
+                
+                months_saved = term - new_months
+                if months_saved > 3:
+                    personalized_tips.append(
+                        f"💡 ถ้าเพิ่มจ่ายอีก {suggested_increase:,.0f} บาท/เดือน → ปิดหนี้เร็วขึ้น {months_saved:.0f} เดือน!"
+                    )
+        
+        # 5. Emergency fund check
+        if monthly_income > 0:
+            emergency_months = loan_amnt / monthly_income
+            if emergency_months > 12:
+                personalized_actions.append("สำรองเงินฉุกเฉิน 6-12 เดือน")
+        
+        # Build final personalized response
+        result['personalized_tip'] = " | ".join(personalized_tips) if personalized_tips else result.get('tip', '')
+        result['personalized_action'] = " | ".join(personalized_actions) if personalized_actions else result.get('action', '')
+        
+        # Add financial summary
+        result['financial_summary'] = {
+            'loan_amount': loan_amnt,
+            'interest_rate': int_rate,
+            'term_months': term,
+            'monthly_payment': round(monthly_payment, 2),
+            'monthly_interest': round(monthly_interest, 2),
+            'total_interest': round(total_interest, 2),
+            'monthly_income': monthly_income,
+            'dti_ratio': round(dti_ratio, 2),
+            'years_to_payoff': round(years_to_payoff, 2)
+        }
         
         response = {
             "success": True,

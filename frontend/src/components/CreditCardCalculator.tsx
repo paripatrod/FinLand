@@ -539,7 +539,59 @@ export default function CreditCardCalculator() {
                   {getSeverityConfig(aiProfile.severity).icon}
                   <div className="flex-1">
                     <div className="font-bold text-lg mb-2">{aiProfile.name}</div>
-                    <div className="text-sm mb-3 leading-relaxed">{aiProfile.tip}</div>
+                    
+                    {/* 🆕 Personalized Analysis Section */}
+                    {aiProfile.personalized_tip && (
+                      <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border border-purple-200 dark:border-purple-700">
+                        <div className="text-sm font-bold text-purple-800 dark:text-purple-200 mb-2">📊 วิเคราะห์จากข้อมูลของคุณ</div>
+                        <div className="space-y-1.5">
+                          {aiProfile.personalized_tip.split(' | ').map((tip: string, i: number) => (
+                            <div key={i} className="text-sm text-purple-700 dark:text-purple-300 flex items-start gap-2">
+                              <span className="mt-0.5">•</span>
+                              <span>{tip}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* 🆕 Personalized Actions */}
+                    {aiProfile.personalized_action && (
+                      <div className="mb-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl border border-amber-200 dark:border-amber-700">
+                        <div className="text-sm font-bold text-amber-800 dark:text-amber-200 mb-2">💡 แนะนำสำหรับคุณ</div>
+                        <div className="space-y-1.5">
+                          {aiProfile.personalized_action.split(' | ').map((action: string, i: number) => (
+                            <div key={i} className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
+                              <span className="font-bold">{i + 1}.</span>
+                              <span>{action}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* 🆕 Financial Summary */}
+                    {aiProfile.financial_summary && (
+                      <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded-lg text-center">
+                          <div className="text-gray-500 dark:text-gray-400">ยอดหนี้</div>
+                          <div className="font-bold text-gray-800 dark:text-gray-200">{formatCurrency(aiProfile.financial_summary.loan_amount)}</div>
+                        </div>
+                        <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded-lg text-center">
+                          <div className="text-gray-500 dark:text-gray-400">ดอกเบี้ย/เดือน</div>
+                          <div className="font-bold text-red-600 dark:text-red-400">{formatCurrency(aiProfile.financial_summary.monthly_interest)}</div>
+                        </div>
+                        <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded-lg text-center">
+                          <div className="text-gray-500 dark:text-gray-400">DTI Ratio</div>
+                          <div className={`font-bold ${aiProfile.financial_summary.dti_ratio > 40 ? 'text-red-600 dark:text-red-400' : aiProfile.financial_summary.dti_ratio > 30 ? 'text-yellow-600 dark:text-yellow-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            {aiProfile.financial_summary.dti_ratio?.toFixed(0) || 0}%
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Original tip as secondary info */}
+                    <div className="text-sm mb-3 leading-relaxed opacity-80">{aiProfile.tip}</div>
                     
                     {/* Risk Score Progress Bar */}
                     {aiProfile.risk_score !== undefined && (
@@ -558,14 +610,6 @@ export default function CreditCardCalculator() {
                             style={{ width: `${aiProfile.risk_score}%` }}
                           />
                         </div>
-                      </div>
-                    )}
-
-                    {/* Action Recommendation */}
-                    {aiProfile.action && (
-                      <div className="mb-3 p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border-2 border-white/50 dark:border-gray-700/50 shadow-sm">
-                        <p className="text-sm font-bold mb-1 dark:text-gray-200">{t('ai.recommendation')}</p>
-                        <p className="text-sm dark:text-gray-300">{aiProfile.action}</p>
                       </div>
                     )}
 
