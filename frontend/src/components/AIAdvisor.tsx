@@ -4,6 +4,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiClient } from '../utils/api';
 import type { ScenarioComparison } from '../types';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AIAdvisorProps {
   balance: number;
@@ -390,8 +392,34 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
                             ? 'bg-emerald-500 text-white rounded-br-md'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-md'
                         }`}>
-                          <div className="text-sm whitespace-pre-line leading-relaxed">
-                            {msg.content}
+                          <div className="text-sm leading-relaxed markdown-content">
+                            {msg.type === 'user' ? (
+                              <div className="whitespace-pre-line">{msg.content}</div>
+                            ) : (
+                              <ReactMarkdown 
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                  // @ts-ignore - Ignore strict type checking for markdown components
+                                  p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                                  // @ts-ignore
+                                  ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2 space-y-1" {...props} />,
+                                  // @ts-ignore
+                                  ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2 space-y-1" {...props} />,
+                                  // @ts-ignore
+                                  li: ({node, ...props}) => <li className="" {...props} />,
+                                  // @ts-ignore
+                                  strong: ({node, ...props}) => <span className="font-bold text-purple-700 dark:text-purple-300" {...props} />,
+                                  // @ts-ignore
+                                  a: ({node, ...props}) => <a className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                                  // @ts-ignore
+                                  blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-purple-300 pl-3 italic my-2" {...props} />,
+                                  // @ts-ignore
+                                  code: ({node, ...props}) => <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded text-xs font-mono" {...props} />,
+                                }}
+                              >
+                                {msg.content}
+                              </ReactMarkdown>
+                            )}
                           </div>
                         </div>
                       </div>
