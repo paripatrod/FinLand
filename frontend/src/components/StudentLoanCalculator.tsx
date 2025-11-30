@@ -543,139 +543,12 @@ export default function StudentLoanCalculator() {
               </div>
             </div>
 
-            {/* AI Profile Analysis */}
+            {/* 🧠 AI Financial Advisor - Combined Analysis */}
             {aiLoading && (
               <div className="bg-gradient-to-r from-purple-50 dark:from-purple-900/20 to-indigo-50 dark:to-indigo-900/20 p-6 rounded-xl shadow-md border-2 border-purple-200 dark:border-purple-700 animate-pulse">
                 <div className="flex items-center space-x-3">
                   <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 animate-spin" />
                   <p className="text-purple-700 dark:text-purple-300 font-semibold">{t('ai.analyzing')}</p>
-                </div>
-              </div>
-            )}
-
-            {aiProfile && (
-              <div className={`p-6 rounded-xl shadow-lg border-2 animate-fade-in ${getSeverityConfig(aiProfile.severity).bg} ${getSeverityConfig(aiProfile.severity).border}`}>
-                <div className="flex items-center space-x-2 mb-4">
-                  <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{t('ai.profileTitle')}</h3>
-                </div>
-
-                <div className={`flex items-start space-x-3 ${getSeverityConfig(aiProfile.severity).text} mb-4`}>
-                  {getSeverityConfig(aiProfile.severity).icon}
-                  <div className="flex-1">
-                    <div className="font-bold text-lg mb-2">{aiProfile.name}</div>
-                    <div className="text-sm mb-3 leading-relaxed">{aiProfile.tip}</div>
-                    
-                    {/* Risk Score Progress Bar */}
-                    {aiProfile.risk_score !== undefined && (
-                      <div className="mb-3">
-                        <div className="flex justify-between text-xs font-semibold mb-1">
-                          <span>{t('ai.riskLevel')}</span>
-                          <span>{aiProfile.risk_score}/100</span>
-                        </div>
-                        <div className="w-full bg-white/70 dark:bg-gray-700/70 rounded-full h-3 overflow-hidden border border-gray-200 dark:border-gray-600">
-                          <div 
-                            className={`h-full transition-all duration-1000 ${
-                              aiProfile.risk_score < 30 ? 'bg-emerald-500' :
-                              aiProfile.risk_score < 50 ? 'bg-yellow-500' :
-                              aiProfile.risk_score < 70 ? 'bg-orange-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${aiProfile.risk_score}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Personalized Analysis Section */}
-                    {aiProfile.personalized_tips && aiProfile.personalized_tips.length > 0 && (
-                      <div className="mb-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
-                        <p className="text-sm font-bold mb-2 text-blue-800 dark:text-blue-200 flex items-center">
-                          📊 วิเคราะห์จากข้อมูลของคุณ
-                        </p>
-                        <ul className="space-y-2">
-                          {aiProfile.personalized_tips.map((tip: string, idx: number) => (
-                            <li key={idx} className="text-sm text-blue-700 dark:text-blue-300 flex items-start">
-                              <span className="mr-2">•</span>
-                              <span>{tip}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Personalized Actions Section */}
-                    {aiProfile.personalized_actions && aiProfile.personalized_actions.length > 0 && (
-                      <div className="mb-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700">
-                        <p className="text-sm font-bold mb-2 text-emerald-800 dark:text-emerald-200 flex items-center">
-                          💡 แนะนำสำหรับคุณ
-                        </p>
-                        <ul className="space-y-2">
-                          {aiProfile.personalized_actions.map((action: string, idx: number) => (
-                            <li key={idx} className="text-sm text-emerald-700 dark:text-emerald-300 flex items-start">
-                              <span className="mr-2">✓</span>
-                              <span>{action}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Financial Summary */}
-                    {aiProfile.financial_summary && (
-                      <div className="mb-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg border border-purple-200 dark:border-purple-700">
-                        <p className="text-sm font-bold mb-2 text-purple-800 dark:text-purple-200 flex items-center">
-                          📈 สรุปสถานะการเงิน
-                        </p>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          {aiProfile.financial_summary.dti_ratio && (
-                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded">
-                              <span className="text-gray-600 dark:text-gray-400">DTI Ratio:</span>
-                              <span className={`ml-1 font-bold ${
-                                parseFloat(aiProfile.financial_summary.dti_ratio) > 40 ? 'text-red-600' :
-                                parseFloat(aiProfile.financial_summary.dti_ratio) > 30 ? 'text-yellow-600' : 'text-emerald-600'
-                              }`}>{aiProfile.financial_summary.dti_ratio}</span>
-                            </div>
-                          )}
-                          {aiProfile.financial_summary.interest_level && (
-                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded">
-                              <span className="text-gray-600 dark:text-gray-400">ดอกเบี้ย:</span>
-                              <span className="ml-1 font-bold text-gray-800 dark:text-gray-200">{aiProfile.financial_summary.interest_level}</span>
-                            </div>
-                          )}
-                          {aiProfile.financial_summary.payoff_duration && (
-                            <div className="bg-white/60 dark:bg-gray-800/60 p-2 rounded col-span-2">
-                              <span className="text-gray-600 dark:text-gray-400">ระยะเวลาผ่อน:</span>
-                              <span className="ml-1 font-bold text-gray-800 dark:text-gray-200">{aiProfile.financial_summary.payoff_duration}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Legacy Action Recommendation (fallback) */}
-                    {aiProfile.action && !aiProfile.personalized_actions && (
-                      <div className="mb-3 p-3 bg-white/80 dark:bg-gray-800/80 rounded-lg border-2 border-white/50 dark:border-gray-700/50 shadow-sm">
-                        <p className="text-sm font-bold mb-1 dark:text-gray-200">{t('ai.recommendation')}</p>
-                        <p className="text-sm dark:text-gray-300">{aiProfile.action}</p>
-                      </div>
-                    )}
-
-                    {/* Badges Row */}
-                    <div className="flex flex-wrap gap-2 items-center">
-                      <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
-                        {getSeverityConfig(aiProfile.severity).label}
-                      </div>
-                      
-                      {/* Confidence Score (only for Enterprise AI v2) */}
-                      {aiProfile.confidence !== undefined && (
-                        <div className="inline-block px-3 py-1.5 bg-white/70 dark:bg-gray-800/70 rounded-full text-xs font-bold border border-white/50 dark:border-gray-700/50">
-                          {t('ai.accuracy')} {aiProfile.confidence.toFixed(1)}%
-                        </div>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -712,11 +585,11 @@ export default function StudentLoanCalculator() {
                   </div>
                 </div>
 
-                {/* Debt Analysis (Synced with What-If) */}
+                {/* Debt Analysis (Synced with What-If) - ใช้ค่าจาก term_months */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
                     <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                      {extraPayment > 0 && whatIfResult ? whatIfResult.months : aiAnalysis.debt_analysis?.debt_freedom_months}
+                      {extraPayment > 0 && whatIfResult ? whatIfResult.months : (Number(years) * 12) || aiAnalysis.debt_analysis?.debt_freedom_months}
                       <span className="text-xs text-gray-500 ml-1">เดือน</span>
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">ปลดหนี้ กยศ.</div>
