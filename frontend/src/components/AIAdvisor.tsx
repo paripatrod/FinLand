@@ -32,7 +32,9 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
   }, [messages]);
 
   // คำนวณผลลัพธ์สำหรับยอดจ่ายต่างๆ
-  const calculateScenario = (monthlyPayment: number) => {
+  const calculateScenario = (monthlyPayment: number): 
+    | { error: string; minPayment: number }
+    | { payment: number; months: number; totalInterest: number; totalPaid: number } => {
     const monthlyRate = apr / 100 / 12;
     const minInterest = balance * monthlyRate;
     
@@ -77,8 +79,9 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
       
       if ('error' in scenario1 || 'error' in scenario2) {
         const err = 'error' in scenario1 ? scenario1 : scenario2;
+        const minPay = 'minPayment' in err ? err.minPayment : 0;
         return { 
-          answer: `⚠️ ยอดจ่ายน้อยเกินไป! ดอกเบี้ยขั้นต่ำคือ ${Math.ceil(err.minPayment).toLocaleString()} บาท/เดือน` 
+          answer: `⚠️ ยอดจ่ายน้อยเกินไป! ดอกเบี้ยขั้นต่ำคือ ${Math.ceil(minPay).toLocaleString()} บาท/เดือน` 
         };
       }
       
@@ -139,8 +142,9 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
       const current = calculateScenario(currentPayment);
       
       if ('error' in current) {
+        const minPay = 'minPayment' in current ? current.minPayment : 0;
         return { 
-          answer: `⚠️ ยอดจ่าย ${currentPayment.toLocaleString()} บาท ต่ำเกินไป!\n\nต้องจ่ายอย่างน้อย ${Math.ceil(current.minPayment).toLocaleString()} บาท/เดือน เพื่อให้หนี้ลดลงได้` 
+          answer: `⚠️ ยอดจ่าย ${currentPayment.toLocaleString()} บาท ต่ำเกินไป!\n\nต้องจ่ายอย่างน้อย ${Math.ceil(minPay).toLocaleString()} บาท/เดือน เพื่อให้หนี้ลดลงได้` 
         };
       }
       
@@ -161,8 +165,9 @@ export default function AIAdvisor({ balance, apr, currentPayment }: AIAdvisorPro
       const scenario = calculateScenario(payment);
       
       if ('error' in scenario) {
+        const minPay = 'minPayment' in scenario ? scenario.minPayment : 0;
         return { 
-          answer: `⚠️ จ่าย ${payment.toLocaleString()} บาท น้อยเกินไป!\n\nดอกเบี้ยต่อเดือน ~${Math.ceil(scenario.minPayment).toLocaleString()} บาท\nต้องจ่ายมากกว่านี้ถึงจะลดหนี้ได้` 
+          answer: `⚠️ จ่าย ${payment.toLocaleString()} บาท น้อยเกินไป!\n\nดอกเบี้ยต่อเดือน ~${Math.ceil(minPay).toLocaleString()} บาท\nต้องจ่ายมากกว่านี้ถึงจะลดหนี้ได้` 
         };
       }
       
