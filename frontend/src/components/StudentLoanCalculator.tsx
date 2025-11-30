@@ -617,15 +617,15 @@ export default function StudentLoanCalculator() {
                     <div className="flex items-center gap-1.5 bg-white/80 dark:bg-gray-800/80 px-3 py-1.5 rounded-lg">
                       <span className="text-base">❤️</span>
                       <span className={`text-xl font-bold ${
-                        aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
-                        aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
                         'text-red-600 dark:text-red-400'
-                      }`}>{aiAnalysis.financial_health?.health_score}</span>
+                      }`}>{aiAnalysis.financial_health?.health_score ?? 0}</span>
                       <span className="text-xs text-gray-500">/100</span>
                     </div>
                     <div className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                      aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
-                      aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
+                      (aiAnalysis.financial_health?.health_score ?? 0) >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
+                      (aiAnalysis.financial_health?.health_score ?? 0) >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
                       'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
                     }`}>
                       {aiAnalysis.strategy?.urgency_level}
@@ -689,7 +689,7 @@ export default function StudentLoanCalculator() {
                   <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700 mb-3">
                     <div className="text-sm text-emerald-700 dark:text-emerald-300">🎯 <b>What-If:</b> เร็วขึ้น <b className="text-emerald-600">{whatIfResult.savedMonths}</b> เดือน ประหยัด <b className="text-emerald-600">{formatCurrency(whatIfResult.savedInterest)}</b></div>
                   </div>
-                ) : aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
+                ) : (aiAnalysis.debt_analysis?.smart_payment_boost ?? 0) > 0 && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-3">
                     <div className="text-sm text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
                   </div>
@@ -780,7 +780,7 @@ export default function StudentLoanCalculator() {
                 </div>
 
                 {/* Emergency Fund */}
-                {aiAnalysis.planning?.emergency_buffer_months > 0 && (
+                {(aiAnalysis.planning?.emergency_buffer_months ?? 0) > 0 && (
                   <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-700 dark:text-blue-300">
                     🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
                   </div>

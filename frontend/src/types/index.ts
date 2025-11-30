@@ -75,6 +75,17 @@ export interface AIAnalysisResponse {
       ratio: number;
       message: string;
     };
+    interest_analysis?: {
+      level: 'low' | 'medium' | 'high';
+      monthly_cost: number;
+      message: string;
+    };
+    action_cards?: Array<{
+      title: string;
+      description: string;
+      impact: string;
+      priority: 'high' | 'medium' | 'low';
+    }>;
   };
 }
 

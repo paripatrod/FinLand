@@ -666,32 +666,32 @@ export default function CreditCardCalculator() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-gray-500">❤️ สุขภาพการเงิน</span>
                       <span className={`text-xl font-bold ${
-                        aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600' :
-                        aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600' : 'text-red-600'
-                      }`}>{aiAnalysis.financial_health?.health_score}/100</span>
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 70 ? 'text-emerald-600' :
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 50 ? 'text-yellow-600' : 'text-red-600'
+                      }`}>{aiAnalysis.financial_health?.health_score ?? 0}/100</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div className={`h-2 rounded-full transition-all duration-1000 ${
-                        aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-500' :
-                        aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`} style={{ width: `${aiAnalysis.financial_health?.health_score}%` }} />
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 70 ? 'bg-emerald-500' :
+                        (aiAnalysis.financial_health?.health_score ?? 0) >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`} style={{ width: `${aiAnalysis.financial_health?.health_score ?? 0}%` }} />
                     </div>
                   </div>
                   <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-gray-500">⚡ ระดับความเสี่ยง</span>
                       <span className={`text-xl font-bold ${
-                        aiAnalysis.insights?.risk_score >= 70 ? 'text-red-600' :
-                        aiAnalysis.insights?.risk_score >= 50 ? 'text-orange-600' :
-                        aiAnalysis.insights?.risk_score >= 30 ? 'text-yellow-600' : 'text-emerald-600'
-                      }`}>{aiAnalysis.insights?.risk_score}/100</span>
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 70 ? 'text-red-600' :
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 50 ? 'text-orange-600' :
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 30 ? 'text-yellow-600' : 'text-emerald-600'
+                      }`}>{aiAnalysis.insights?.risk_score ?? 0}/100</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div className={`h-2 rounded-full transition-all duration-1000 ${
-                        aiAnalysis.insights?.risk_score >= 70 ? 'bg-red-500' :
-                        aiAnalysis.insights?.risk_score >= 50 ? 'bg-orange-500' :
-                        aiAnalysis.insights?.risk_score >= 30 ? 'bg-yellow-500' : 'bg-emerald-500'
-                      }`} style={{ width: `${aiAnalysis.insights?.risk_score}%` }} />
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 70 ? 'bg-red-500' :
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 50 ? 'bg-orange-500' :
+                        (aiAnalysis.insights?.risk_score ?? 0) >= 30 ? 'bg-yellow-500' : 'bg-emerald-500'
+                      }`} style={{ width: `${aiAnalysis.insights?.risk_score ?? 0}%` }} />
                     </div>
                   </div>
                 </div>
@@ -765,7 +765,7 @@ export default function CreditCardCalculator() {
                 </div>
 
                 {/* Emergency Fund */}
-                {aiAnalysis.planning?.emergency_buffer_months > 0 && (
+                {(aiAnalysis.planning?.emergency_buffer_months ?? 0) > 0 && (
                   <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-700 dark:text-blue-300">
                     🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
                   </div>
