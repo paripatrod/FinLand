@@ -209,14 +209,23 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
     setIsTyping(true);
     
     // Check if it's a simple calculation question (use local)
+    // Simple calc: starts with number, contains "vs", exact payment/timing queries
     const isSimpleCalc = /^\d/.test(messageText) || 
                          messageText.includes('vs') || 
-                         messageText.includes('เท่าไหร่') ||
+                         messageText.includes('ควรจ่ายเท่าไหร่') ||
                          messageText.includes('เมื่อไหร่') ||
-                         messageText.includes('กี่เดือน');
+                         messageText.includes('กี่เดือน') ||
+                         messageText.includes('When will') ||
+                         messageText.includes('How much should I pay');
     
-    // Try Gemini for complex questions, fallback to local
-    if (useGemini && !isSimpleCalc) {
+    // Last quick question (index 4) should always use Gemini for advice
+    const isAdviceQuestion = messageText.includes('ลดหนี้เร็ว') || 
+                             messageText.includes('เพิ่มยอดจ่ายอีก') ||
+                             messageText.includes('pay off faster') ||
+                             messageText.includes('extra should I pay');
+    
+    // Try Gemini for complex questions or advice questions, fallback to local
+    if (useGemini && (!isSimpleCalc || isAdviceQuestion)) {
       try {
         const response = await apiClient.post('/api/ai-chat', {
           question: messageText,
