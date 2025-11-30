@@ -569,13 +569,7 @@ def ai_chat():
         # Use Gemini Pro model
         model = genai.GenerativeModel('gemini-1.5-flash')
         
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=500,
-                temperature=0.7,
-            )
-        )
+        response = model.generate_content(prompt)
         
         answer = response.text
         
