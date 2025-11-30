@@ -6,6 +6,7 @@ export interface CreditCardRequest {
 }
 
 export interface CreditCardResponse { 
+  success?: boolean;
   months: number;
   total_paid: number;
   total_interest: number;
@@ -13,12 +14,13 @@ export interface CreditCardResponse {
 }
 
 export interface StudentLoanRequest { 
-  principal: number; 
-  apr: number; 
-  years: number;
+  loan_amount: number; 
+  interest_rate: number; 
+  term_months: number;
 }
 
 export interface StudentLoanResponse { 
+  success?: boolean;
   monthly_payment: number;
   total_paid: number;
   total_interest: number;
@@ -31,6 +33,49 @@ export interface PaymentScheduleItem {
   interest: number;
   principal: number;
   remaining: number;
+}
+
+// AI Analysis v4.0 Response Types
+export interface AIAnalysisResponse {
+  success: boolean;
+  version: string;
+  financial_health?: {
+    health_score: number;
+    dti_ratio: number;
+    affordability_index: number;
+  };
+  insights?: {
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    risk_score: number;
+    tips: string[];
+    actions: string[];
+  };
+  debt_analysis?: {
+    debt_freedom_months: number;
+    smart_payment_boost: number;
+    time_saved: number;
+    time_saved_months?: number;
+    money_saved: number;
+    money_saved_total?: number;
+  };
+  strategy?: {
+    payoff_strategy: string;
+    primary_action: string;
+    urgency_level?: string;
+  };
+  planning?: {
+    emergency_buffer_months: number;
+  };
+  personalized_insights?: {
+    risk_level: 'low' | 'medium' | 'high' | 'critical';
+    risk_meter: number;
+    smart_tips: string[];
+    dti_analysis?: {
+      status: 'healthy' | 'warning' | 'critical';
+      ratio: number;
+      message: string;
+    };
+  };
 }
 
 // AI Profile Types

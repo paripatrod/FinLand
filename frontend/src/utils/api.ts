@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE_URL = 'https://finland-ilb5.onrender.com';
+// API Configuration - Use environment variable or fallback to production
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://finland-ilb5.onrender.com';
 
 export const apiClient = {
   async post(endpoint: string, data: any) {

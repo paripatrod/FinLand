@@ -14,11 +14,47 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# CORS Configuration - Allow all origins for now (change in production)
+# CORS Configuration - Restrict to specific origins in production
+ALLOWED_ORIGINS = [
+    "https://financial-calculator-thailand.vercel.app",
+    "https://fin-land.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173"
+]
+
 CORS(app, 
-     resources={r"/api/*": {"origins": "*"}},
-     allow_headers=["Content-Type", "Accept"],
-     methods=["GET", "POST", "OPTIONS"])
+     resources={r"/api/*": {"origins": ALLOWED_ORIGINS}},
+     allow_headers=["Content-Type", "Accept", "X-Requested-With"],
+     methods=["GET", "POST", "OPTIONS"],
+     supports_credentials=False,
+     max_age=86400)
+
+# Security Headers Middleware
+@app.after_request
+def add_security_headers(response):
+    # Content Security Policy
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://finland-ilb5.onrender.com https://generativelanguage.googleapis.com; "
+        "frame-ancestors 'none';"
+    )
+    # Prevent clickjacking
+    response.headers['X-Frame-Options'] = 'DENY'
+    # Prevent MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # XSS Protection
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # Referrer Policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    # Permissions Policy
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+    return response
 
 # Rate Limiting Configuration
 limiter = Limiter(

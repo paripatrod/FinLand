@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Download, Save, Sparkles, AlertCircle, Calculator, Printer } from 'lucide-react'
+import { Download, Save, Sparkles, Calculator, Printer } from 'lucide-react'
 import { saveCalculation, saveToHistory } from '../utils/storage'
 import { useLanguage } from '../contexts/LanguageContext'
 import { apiClient } from '../utils/api'
@@ -11,7 +11,7 @@ import CountUpNumber from './ui/CountUpNumber'
 import CurrencyInput from './ui/CurrencyInput'
 import { motion } from 'framer-motion'
 import { printPaymentSchedule } from '../utils/pdfExport'
-import { sanitizeNumber } from '../utils/sanitize'
+import type { StudentLoanResponse, AIAnalysisResponse, WhatIfResult } from '../types'
 
 export default function StudentLoanCalculator() {
   const { t } = useLanguage()
@@ -20,14 +20,14 @@ export default function StudentLoanCalculator() {
   const [years, setYears] = useState('15')
   const [monthlyIncome, setMonthlyIncome] = useState('')
   const [extraPayment, setExtraPayment] = useState(0)
-  const [result, setResult] = useState<any | null>(null)
+  const [result, setResult] = useState<StudentLoanResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
-  const [aiAnalysis, setAiAnalysis] = useState<any | null>(null)  // AI v4.0
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisResponse | null>(null)
 
-  const whatIfResult = React.useMemo(() => {
+  const whatIfResult = React.useMemo<WhatIfResult | null>(() => {
     if (!result || extraPayment === 0) return null;
     const totalMonthly = result.monthly_payment + extraPayment;
     const monthlyRate = (Number(apr) / 100) / 12;
@@ -373,19 +373,23 @@ export default function StudentLoanCalculator() {
         </form>
 
         {error && (
-          <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg animate-fade-in">
-            <div className="flex items-center">
-              <span className="text-2xl mr-3">❌</span>
-              <div>
-                <h3 className="text-sm font-bold text-red-800 dark:text-red-300">{t('common.error')}</h3>
-                <p className="text-sm text-red-700 dark:text-red-200 mt-1">{error}</p>
+          <div 
+            role="alert" 
+            aria-live="assertive"
+            className="mt-6 p-5 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 border-l-4 border-red-500 rounded-xl animate-fade-in shadow-md"
+          >
+            <div className="flex items-start gap-4">
+              <div className="text-3xl" aria-hidden="true">⚠️</div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-red-800 dark:text-red-300 mb-2">{t('common.error')}</h3>
+                <p className="text-sm text-red-700 dark:text-red-200 whitespace-pre-line leading-relaxed">{error}</p>
               </div>
             </div>
           </div>
         )}
 
         {result && (
-          <div className="mt-8 space-y-6 animate-fade-in">
+          <div className="mt-8 space-y-6 animate-fade-in" role="region" aria-label="ผลการคำนวณ" aria-live="polite">
             {/* Success Message */}
             {saved && (
               <div className="bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 p-4 rounded-lg animate-fade-in">
