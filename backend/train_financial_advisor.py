@@ -493,7 +493,7 @@ print("\n📊 Generating MEGA training dataset (300,000 samples)...")
 print("   Covering ALL Thai financial scenarios...")
 
 np.random.seed(42)
-n_samples = 300000
+n_samples = 1000000  # 1 ล้าน samples - ครอบคลุมทุกสถานการณ์!
 
 # Thai Financial Landscape
 INCOME_DISTRIBUTIONS = {
@@ -782,10 +782,10 @@ X_test_scaled = scaler.transform(X_test)
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n🤖 Training ULTIMATE Financial Advisor Models...")
 
-# Regression Model
-print("\n📊 Training Multi-Output Regression (16 targets)...")
+# Regression Model - LITE VERSION สำหรับ Render (< 512MB)
+print("\n📊 Training Multi-Output Regression (16 targets) - LITE...")
 reg_model = MultiOutputRegressor(
-    RandomForestRegressor(n_estimators=50, max_depth=12, min_samples_split=30,
+    RandomForestRegressor(n_estimators=15, max_depth=8, min_samples_split=50,
                           random_state=42, n_jobs=-1)
 )
 reg_model.fit(X_train_scaled, y_reg_train)
@@ -798,9 +798,9 @@ for i, name in enumerate(regression_targets):
     r2 = r2_score(y_reg_test[:, i], y_reg_pred[:, i])
     print(f"  {name:30} | MAE: {mae:10,.2f} | R²: {r2:.4f}")
 
-# Classification Models
-print("\n🎯 Training Classifiers...")
-clf_params = {'n_estimators': 80, 'max_depth': 12, 'random_state': 42, 'n_jobs': -1}
+# Classification Models - LITE VERSION
+print("\n🎯 Training Classifiers - LITE...")
+clf_params = {'n_estimators': 15, 'max_depth': 8, 'random_state': 42, 'n_jobs': -1}
 
 strat_model = RandomForestClassifier(**clf_params)
 strat_model.fit(X_train_scaled, y_strat_train)
@@ -875,7 +875,7 @@ model_package = {
     }
 }
 
-joblib.dump(model_package, 'financial_advisor_model.pkl', compress=3)
+joblib.dump(model_package, 'financial_advisor_model.pkl', compress=9)  # Max compression
 print("✅ Saved: financial_advisor_model.pkl")
 
 # ═══════════════════════════════════════════════════════════════════════════════
