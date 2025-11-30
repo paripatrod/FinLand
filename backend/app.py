@@ -275,11 +275,21 @@ def predict_profile():
         print(f"📥 Received prediction request: {data}")
         
         # Support both naming conventions for flexibility
-        loan_amnt = float(data.get('loan_amnt') or data.get('loan_amount'))
-        int_rate = float(data.get('int_rate') or data.get('interest_rate'))
-        term = float(data.get('term'))
-        monthly_income = float(data.get('monthly_income', 0))
-        monthly_payment = float(data.get('monthly_payment', 0))
+        loan_amnt = float(data.get('loan_amnt') or data.get('loan_amount') or 0)
+        int_rate = float(data.get('int_rate') or data.get('interest_rate') or 0)
+        term = data.get('term')
+        monthly_income = float(data.get('monthly_income', 0) or 0)
+        monthly_payment = float(data.get('monthly_payment', 0) or 0)
+        
+        # Validate required fields
+        if loan_amnt <= 0:
+            return jsonify({"error": "กรุณาระบุยอดหนี้"}), 400
+        if int_rate <= 0:
+            return jsonify({"error": "กรุณาระบุอัตราดอกเบี้ย"}), 400
+        if term is None or term == 0:
+            return jsonify({"error": "ไม่สามารถคำนวณได้ กรุณาตรวจสอบยอดจ่ายต่อเดือน"}), 400
+        
+        term = float(term)
 
         # Calculate monthly payment if not provided (for DTI calculation)
         if monthly_payment <= 0:
