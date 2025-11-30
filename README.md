@@ -6,7 +6,7 @@
 ![Python](https://img.shields.io/badge/python-3.13-blue)
 ![React](https://img.shields.io/badge/react-18-blue)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0-blue)
-![AI Accuracy](https://img.shields.io/badge/AI%20Accuracy-89.96%25-brightgreen)
+![AI Accuracy](https://img.shields.io/badge/AI%20Accuracy-98.80%25-brightgreen)
 ![Status](https://img.shields.io/badge/status-Production-success)
 
 **แอปคำนวณหนี้ออนไลน์ฟรี 100%** พร้อม AI วิเคราะห์โปรไฟล์หนี้แบบเรียลไทม์  
@@ -14,7 +14,7 @@
 
 🌐 **Live Demo**: [financial-calculator-app.vercel.app](https://financial-calculator-app.vercel.app)  
 📦 **GitHub**: [github.com/paripatrod/FinLand](https://github.com/paripatrod/FinLand)  
-🤖 **AI Model**: [Hugging Face](https://huggingface.co/Pottersk/financial-calculator-ai-model)
+🤖 **AI Model**: [Hugging Face](https://huggingface.co/Pottersk/finland-ai-model)
 
 ---
 
@@ -52,17 +52,18 @@
 
 ---
 
-## 🤖 AI Model Specifications (v4.0.0)
+## 🤖 AI Model Specifications (v3.0.0 - Financial Advisor)
 
 ### Model Performance
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| **Algorithm** | RandomForest Classifier | ✅ |
-| **Test Accuracy** | 89.96% | ✅ Exceeds 85% target |
-| **Inference Speed** | ~120ms | ✅ Under 500ms target |
-| **Model Size** | 3.23 MB | ✅ Under 5MB target |
-| **Total Profiles** | 100 | ✅ Full coverage |
+| **Algorithm** | RandomForest + MultiOutputRegressor | ✅ |
+| **Regression R²** | 98.80% | ✅ Exceeds 95% target |
+| **Classification Accuracy** | 96.54% | ✅ Exceeds 90% target |
+| **Model Size** | 3.46 MB | ✅ Under 5MB target |
+| **Training Samples** | 1,000,000 | ✅ Comprehensive coverage |
+| **Predictions** | 21 dimensions | ✅ Full financial analysis |
 
 ### Profile Categories (100 Profiles)
 
