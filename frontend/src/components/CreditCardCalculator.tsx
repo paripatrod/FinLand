@@ -490,6 +490,11 @@ export default function CreditCardCalculator() {
                       <span>0</span>
                       <span>{formatCurrency(Number(monthlyIncome) || Number(monthlyPayment) * 2)}</span>
                     </div>
+                    <div className="mt-4 flex justify-center">
+                        <div className="px-4 py-2 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-semibold shadow-sm">
+                            + {formatCurrency(extraPayment)} / {t('common.months')}
+                        </div>
+                    </div>
                   </div>
 
                   {whatIfResult && (
