@@ -69,15 +69,21 @@ export default function CreditCardCalculator() {
     try {
       const res = await apiClient.post('/api/calculate/credit-card', payload)
       
+      // Clone response to allow reading body twice if needed
+      const resClone = res.clone()
+      
       // Try to parse JSON, handle non-JSON responses
       let data;
       try {
         data = await res.json()
       } catch (jsonErr) {
         // If response is not JSON (e.g., HTML error page)
-        const text = await res.text().catch(() => 'Unknown error')
+        const text = await resClone.text().catch(() => 'Unknown error')
+        console.error('Non-JSON response:', text)
         throw new Error(`เซิร์ฟเวอร์ไม่ตอบสนอง กรุณาลองใหม่อีกครั้ง`)
       }
+      
+      console.log('API Response:', { ok: res.ok, status: res.status, data })
       
       if (!res.ok || data.success === false) {
         // Build detailed error message
@@ -87,15 +93,16 @@ export default function CreditCardCalculator() {
         if (data.error_type === 'payment_too_low' && data.details) {
           const d = data.details
           errorMsg = `⚠️ ยอดจ่ายต่ำเกินไป!\n\n` +
-            `💳 คุณจ่าย: ${d.monthly_payment?.toLocaleString() || monthlyPayment} บาท/เดือน\n` +
-            `💸 ดอกเบี้ยต่อเดือน: ${d.monthly_interest?.toLocaleString() || '?'} บาท\n` +
-            `📈 หนี้จะเพิ่มขึ้น: ${d.shortfall?.toLocaleString() || '?'} บาท/เดือน\n\n` +
-            `✅ แนะนำ: จ่ายอย่างน้อย ${d.minimum_payment?.toLocaleString() || '?'} บาท/เดือน`
+            `💳 คุณจ่าย: ${Number(d.monthly_payment || monthlyPayment).toLocaleString()} บาท/เดือน\n` +
+            `💸 ดอกเบี้ยต่อเดือน: ${Number(d.monthly_interest || 0).toLocaleString()} บาท\n` +
+            `📈 หนี้จะเพิ่มขึ้น: ${Number(d.shortfall || 0).toLocaleString()} บาท/เดือน\n\n` +
+            `✅ แนะนำ: จ่ายอย่างน้อย ${Number(d.minimum_payment || 0).toLocaleString()} บาท/เดือน`
         } else if (data.message) {
           errorMsg += '\n\n' + data.message
           if (data.recommendation) errorMsg += '\n\n' + data.recommendation
         }
         
+        console.log('Setting error:', errorMsg)
         setError(errorMsg)
         setLoading(false)
         return
