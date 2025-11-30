@@ -680,31 +680,29 @@ export default function StudentLoanCalculator() {
               </div>
             )}
 
-            {/* 🧠 AI Financial Advisor - Compact */}
+            {/* 🧠 AI Financial Advisor */}
             {aiAnalysis && (
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-3 sm:p-4 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 animate-fade-in">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 p-4 sm:p-5 rounded-xl shadow-md border border-indigo-200 dark:border-indigo-700 animate-fade-in">
                 {/* Header + Health Score Row */}
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow">
-                      <Sparkles className="w-4 h-4 text-white" />
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow">
+                      <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-sm text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์</h3>
-                    </div>
+                    <h3 className="font-bold text-base text-gray-900 dark:text-gray-100">🧠 AI วิเคราะห์การเงิน</h3>
                   </div>
                   {/* Health Score Inline */}
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 bg-white/80 dark:bg-gray-800/80 px-2 py-1 rounded-lg">
-                      <span className="text-sm">❤️</span>
-                      <span className={`text-lg font-bold ${
+                    <div className="flex items-center gap-1.5 bg-white/80 dark:bg-gray-800/80 px-3 py-1.5 rounded-lg">
+                      <span className="text-base">❤️</span>
+                      <span className={`text-xl font-bold ${
                         aiAnalysis.financial_health?.health_score >= 70 ? 'text-emerald-600 dark:text-emerald-400' :
                         aiAnalysis.financial_health?.health_score >= 50 ? 'text-yellow-600 dark:text-yellow-400' :
                         'text-red-600 dark:text-red-400'
                       }`}>{aiAnalysis.financial_health?.health_score}</span>
-                      <span className="text-[10px] text-gray-500">/100</span>
+                      <span className="text-xs text-gray-500">/100</span>
                     </div>
-                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <div className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                       aiAnalysis.financial_health?.health_score >= 70 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
                       aiAnalysis.financial_health?.health_score >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300' :
                       'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
@@ -714,53 +712,53 @@ export default function StudentLoanCalculator() {
                   </div>
                 </div>
 
-                {/* Debt Analysis - Compact (Synced with What-If) */}
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <div className="text-center p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
-                    <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
+                {/* Debt Analysis (Synced with What-If) */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg relative">
+                    <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {extraPayment > 0 && whatIfResult ? whatIfResult.months : aiAnalysis.debt_analysis?.debt_freedom_months}
-                      <span className="text-[10px] text-gray-500 ml-0.5">เดือน</span>
+                      <span className="text-xs text-gray-500 ml-1">เดือน</span>
                     </div>
-                    <div className="text-[9px] text-gray-500">ปลดหนี้ กยศ.</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">ปลดหนี้ กยศ.</div>
                     {extraPayment > 0 && whatIfResult && whatIfResult.savedMonths > 0 && (
-                      <div className="absolute -top-1 -right-1 px-1 py-0.5 bg-emerald-500 text-white text-[8px] font-bold rounded-full">-{whatIfResult.savedMonths}</div>
+                      <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full">-{whatIfResult.savedMonths}</div>
                     )}
                   </div>
-                  <div className="text-center p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
-                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
+                    <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                       +{formatCurrency(extraPayment > 0 ? extraPayment : aiAnalysis.debt_analysis?.smart_payment_boost)}
                     </div>
-                    <div className="text-[9px] text-gray-500">{extraPayment > 0 ? 'What-If' : 'แนะนำจ่ายเพิ่ม'}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">{extraPayment > 0 ? 'จ่ายเพิ่ม (What-If)' : 'แนะนำจ่ายเพิ่ม/เดือน'}</div>
                   </div>
                 </div>
 
-                {/* What-If or Tip - Compact */}
+                {/* What-If or Tip */}
                 {extraPayment > 0 && whatIfResult ? (
-                  <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700 mb-2">
-                    <div className="text-[10px] text-emerald-700 dark:text-emerald-300">🎯 เร็วขึ้น <b>{whatIfResult.savedMonths}</b> เดือน ประหยัด <b>{formatCurrency(whatIfResult.savedInterest)}</b></div>
+                  <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg border border-emerald-200 dark:border-emerald-700 mb-3">
+                    <div className="text-sm text-emerald-700 dark:text-emerald-300">🎯 <b>What-If:</b> เร็วขึ้น <b className="text-emerald-600">{whatIfResult.savedMonths}</b> เดือน ประหยัด <b className="text-emerald-600">{formatCurrency(whatIfResult.savedInterest)}</b></div>
                   </div>
                 ) : aiAnalysis.debt_analysis?.smart_payment_boost > 0 && (
-                  <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-2">
-                    <div className="text-[10px] text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700 mb-3">
+                    <div className="text-sm text-amber-700 dark:text-amber-300">💡 จ่ายเพิ่มจะเร็วขึ้น <b>{aiAnalysis.debt_analysis?.time_saved_months}</b> เดือน ประหยัด <b>{formatCurrency(aiAnalysis.debt_analysis?.money_saved_total)}</b></div>
                   </div>
                 )}
 
-                {/* Strategy Row - Compact */}
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
-                    <div className="text-[9px] text-gray-500">🎯 กลยุทธ์</div>
-                    <div className="font-semibold text-[11px] text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
+                {/* Strategy Row */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div className="text-xs text-gray-500 mb-1">🎯 กลยุทธ์แนะนำ</div>
+                    <div className="font-semibold text-sm text-blue-700 dark:text-blue-300">{aiAnalysis.strategy?.payoff_strategy}</div>
                   </div>
-                  <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-800">
-                    <div className="text-[9px] text-gray-500">⭐ ควรทำก่อน</div>
-                    <div className="font-semibold text-[11px] text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
+                    <div className="text-xs text-gray-500 mb-1">⭐ สิ่งที่ควรทำก่อน</div>
+                    <div className="font-semibold text-sm text-amber-700 dark:text-amber-300">{aiAnalysis.strategy?.primary_action}</div>
                   </div>
                 </div>
 
-                {/* Emergency Fund - Compact */}
+                {/* Emergency Fund */}
                 {aiAnalysis.planning?.emergency_buffer_months > 0 && (
-                  <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-[10px] text-blue-700 dark:text-blue-300">
-                    🏦 ควรมีเงินสำรอง <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
+                  <div className="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+                    🏦 ควรมีเงินสำรองฉุกเฉินอย่างน้อย <b>{aiAnalysis.planning?.emergency_buffer_months}</b> เดือน
                   </div>
                 )}
               </div>
