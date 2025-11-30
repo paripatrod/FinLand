@@ -566,17 +566,40 @@ def ai_chat():
 6. อย่าให้คำแนะนำทางกฎหมายหรือการลงทุนที่ซับซ้อน
 7. ถ้าคำถามไม่เกี่ยวกับการเงิน ให้บอกว่าเชี่ยวชาญเรื่องหนี้และการเงินเท่านั้น"""
 
-        # Use Gemini 1.5 Flash (Latest stable model)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Try multiple models in order of preference
+        models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro', 'gemini-pro']
+        answer = None
+        used_model = None
+        last_error = None
+
+        for model_name in models_to_try:
+            try:
+                print(f"🤖 Trying Gemini model: {model_name}...")
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(prompt)
+                answer = response.text
+                used_model = model_name
+                print(f"✅ Success with model: {model_name}")
+                break
+            except Exception as e:
+                print(f"⚠️ Failed with {model_name}: {str(e)}")
+                last_error = e
+                continue
         
-        response = model.generate_content(prompt)
-        
-        answer = response.text
+        if not answer:
+            # If all fail, try to list available models to debug
+            try:
+                print("📋 Listing available models...")
+                for m in genai.list_models():
+                    print(f"  - {m.name}")
+            except:
+                pass
+            raise last_error or Exception("All models failed")
         
         return jsonify({
             "success": True,
             "answer": answer,
-            "model": "gemini-1.5-flash",
+            "model": used_model,
             "context": {
                 "balance": balance,
                 "apr": apr,
