@@ -145,48 +145,7 @@ export default function Home(){
       <section className="container-padding">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-6 lg:space-y-8">
-            {/* How to Use */}
-            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 lg:p-10 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8 flex items-center">
-                <span className="inline-block w-2 h-8 sm:h-10 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full mr-3 sm:mr-4"></span>
-                {t('howto.title')}
-              </h2>
-              <ol className="space-y-5 sm:space-y-6">
-                <HowToStep number={1} text={t('howto.step1')} />
-                <HowToStep number={2} text={t('howto.step2')} />
-                <HowToStep number={3} text={t('howto.step3')} />
-              </ol>
-            </div>
-
-            {/* CTA Section */}
-            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 p-8 sm:p-10 lg:p-12 rounded-2xl shadow-xl text-white">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{t('cta.title')}</h3>
-              <p className="text-base sm:text-lg text-emerald-50 dark:text-emerald-100 mb-8 sm:mb-10">{t('cta.subtitle')}</p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  to="/credit-card" 
-                  className="min-h-[56px] px-8 py-4 bg-white dark:bg-gray-100 text-emerald-600 dark:text-emerald-700 rounded-xl font-semibold hover:bg-emerald-50 dark:hover:bg-white transition-all duration-200 text-center text-base sm:text-lg shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  {t('cta.startCredit')}
-                </Link>
-                <Link 
-                  to="/student-loan" 
-                  className="min-h-[56px] px-8 py-4 bg-emerald-600 dark:bg-emerald-700 text-white rounded-xl font-semibold hover:bg-emerald-700 dark:hover:bg-emerald-800 border-2 border-white transition-all duration-200 text-center text-base sm:text-lg shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  {t('cta.startStudent')}
-                </Link>
-                <Link 
-                  to="/dashboard" 
-                  className="min-h-[56px] px-8 py-4 bg-purple-600 dark:bg-purple-700 text-white rounded-xl font-semibold hover:bg-purple-700 dark:hover:bg-purple-800 border-2 border-white transition-all duration-200 text-center text-base sm:text-lg shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  {t('cta.viewHistory')}
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
+            {/* Warning & Tips moved here */}
             <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 dark:border-amber-500 p-5 sm:p-6 rounded-xl shadow-md">
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="flex-shrink-0 text-2xl sm:text-3xl">
@@ -200,7 +159,10 @@ export default function Home(){
                 </div>
               </div>
             </div>
+          </div>
 
+          {/* Sidebar */}
+          <div className="space-y-6">
             <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-700 p-5 sm:p-6 rounded-xl shadow-sm">
               <h3 className="text-base sm:text-lg font-bold text-emerald-900 dark:text-emerald-300 mb-4 flex items-center gap-2">
                 <span className="text-2xl">💡</span>
@@ -252,21 +214,5 @@ function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
       <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">{title}</h3>
       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">{description}</p>
     </div>
-  );
-}
-
-interface HowToStepProps {
-  number: number;
-  text: string;
-}
-
-function HowToStep({ number, text }: HowToStepProps) {
-  return (
-    <li className="flex items-start gap-4 sm:gap-5">
-      <span className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-bold text-base sm:text-lg shadow-md">
-        {number}
-      </span>
-      <span className="flex-1 text-base sm:text-lg text-gray-700 dark:text-gray-300 pt-2 sm:pt-3 leading-relaxed">{text}</span>
-    </li>
   );
 }
