@@ -104,7 +104,23 @@ const translations: Record<Language, Record<string, string>> = {
     'common.download': 'ดาวน์โหลด CSV',
     'common.error': 'เกิดข้อผิดพลาด',
     'common.monthlyIncome': 'รายได้ต่อเดือน',
+    'common.monthlyIncome.help': 'ใช้คำนวณสัดส่วนหนี้ต่อรายได้ (DTI)',
     'common.delete': 'ลบ',
+    
+    // Optional Fields
+    'optional.title': 'ข้อมูลเพิ่มเติมเพื่อ AI วิเคราะห์แม่นยำขึ้น',
+    'optional.badge': 'ไม่บังคับ',
+    'optional.age': 'อายุ (ปี)',
+    'optional.age.help': 'ใช้คำนวณ retirement planning',
+    'optional.age.helpStudent': 'กยศ. อายุมักเริ่มที่ 22-25 ปี',
+    'optional.expenses': 'รายจ่ายต่อเดือน',
+    'optional.expenses.help': 'ค่าใช้จ่ายประจำ (ไม่รวมหนี้)',
+    'optional.savings': 'เงินเก็บปัจจุบัน',
+    'optional.savings.help': 'เงินออมรวมทั้งหมดที่มี',
+    'optional.emergency': 'เงินสำรองฉุกเฉิน (เดือน)',
+    'optional.emergency.help': 'ถ้าตกงาน อยู่ได้กี่เดือน?',
+    'optional.aiNote': 'AI จะช่วยคำนวณแผนการเงินระยะยาว',
+    'optional.aiNoteStudent': 'สำหรับ กยศ. AI จะช่วยคำนวณแผนการเงินระยะยาว',
     
     // Dashboard
     'dashboard.title': 'ประวัติการคำนวณ',
@@ -369,7 +385,23 @@ const translations: Record<Language, Record<string, string>> = {
     'common.download': 'Download CSV',
     'common.error': 'Error',
     'common.monthlyIncome': 'Monthly Income',
+    'common.monthlyIncome.help': 'Used to calculate Debt-to-Income ratio (DTI)',
     'common.delete': 'Delete',
+    
+    // Optional Fields
+    'optional.title': 'Additional info for better AI analysis',
+    'optional.badge': 'Optional',
+    'optional.age': 'Age (years)',
+    'optional.age.help': 'Used for retirement planning',
+    'optional.age.helpStudent': 'Student loans typically start at age 22-25',
+    'optional.expenses': 'Monthly Expenses',
+    'optional.expenses.help': 'Regular expenses (excluding debt)',
+    'optional.savings': 'Current Savings',
+    'optional.savings.help': 'Total savings you have',
+    'optional.emergency': 'Emergency Fund (months)',
+    'optional.emergency.help': 'How many months can you survive without income?',
+    'optional.aiNote': 'AI will help calculate long-term financial plan',
+    'optional.aiNoteStudent': 'For student loans, AI will help calculate long-term financial plan',
     
     // Dashboard
     'dashboard.title': 'Calculation History',
@@ -631,7 +663,23 @@ const translations: Record<Language, Record<string, string>> = {
     'common.download': '下载CSV',
     'common.error': '错误',
     'common.monthlyIncome': '月收入',
+    'common.monthlyIncome.help': '用于计算债务收入比 (DTI)',
     'common.delete': '删除',
+    
+    // Optional Fields
+    'optional.title': '额外信息以提高AI分析准确性',
+    'optional.badge': '可选',
+    'optional.age': '年龄（岁）',
+    'optional.age.help': '用于退休规划',
+    'optional.age.helpStudent': '学生贷款通常从22-25岁开始',
+    'optional.expenses': '每月支出',
+    'optional.expenses.help': '日常开支（不包括债务）',
+    'optional.savings': '当前储蓄',
+    'optional.savings.help': '您拥有的总储蓄',
+    'optional.emergency': '应急基金（月）',
+    'optional.emergency.help': '没有收入能维持几个月？',
+    'optional.aiNote': 'AI将帮助计算长期财务计划',
+    'optional.aiNoteStudent': '对于学生贷款，AI将帮助计算长期财务计划',
     
     // Dashboard
     'dashboard.title': '计算历史',
@@ -893,7 +941,23 @@ const translations: Record<Language, Record<string, string>> = {
     'common.download': 'CSVダウンロード',
     'common.error': 'エラー',
     'common.monthlyIncome': '月収',
+    'common.monthlyIncome.help': '債務収入比率 (DTI) の計算に使用',
     'common.delete': '削除',
+    
+    // Optional Fields
+    'optional.title': 'AI分析精度向上のための追加情報',
+    'optional.badge': '任意',
+    'optional.age': '年齢（歳）',
+    'optional.age.help': '退職計画に使用',
+    'optional.age.helpStudent': '学生ローンは通常22-25歳から開始',
+    'optional.expenses': '毎月の支出',
+    'optional.expenses.help': '通常の支出（債務を除く）',
+    'optional.savings': '現在の貯蓄',
+    'optional.savings.help': '持っている総貯蓄',
+    'optional.emergency': '緊急資金（月）',
+    'optional.emergency.help': '収入なしで何ヶ月生活できますか？',
+    'optional.aiNote': 'AIが長期的な財務計画を計算します',
+    'optional.aiNoteStudent': '学生ローンの場合、AIが長期的な財務計画を計算します',
     
     // Dashboard
     'dashboard.title': '計算履歴',

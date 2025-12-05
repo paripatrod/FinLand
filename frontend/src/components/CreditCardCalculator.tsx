@@ -380,11 +380,11 @@ export default function CreditCardCalculator() {
 
             <CurrencyInput
               id="monthlyIncome"
-              label={t('common.monthlyIncome') || 'รายได้ต่อเดือน'}
+              label={t('common.monthlyIncome')}
               value={monthlyIncome}
               onChange={setMonthlyIncome}
               placeholder="25000"
-              helpText="ใช้คำนวณสัดส่วนหนี้ต่อรายได้ (DTI)"
+              helpText={t('common.monthlyIncome.help')}
             />
           </div>
 
@@ -398,10 +398,10 @@ export default function CreditCardCalculator() {
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-purple-500" />
                 <span className="font-medium text-gray-700 dark:text-gray-300">
-                  ข้อมูลเพิ่มเติมเพื่อ AI วิเคราะห์แม่นยำขึ้น
+                  {t('optional.title')}
                 </span>
                 <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">
-                  ไม่บังคับ
+                  {t('optional.badge')}
                 </span>
               </div>
               {showOptional ? (
@@ -425,7 +425,7 @@ export default function CreditCardCalculator() {
                       {/* Age */}
                       <div className="relative group">
                         <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          อายุ (ปี)
+                          {t('optional.age')}
                         </label>
                         <input
                           id="age"
@@ -438,18 +438,18 @@ export default function CreditCardCalculator() {
                           placeholder="30"
                         />
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          ใช้คำนวณ retirement planning
+                          {t('optional.age.help')}
                         </p>
                       </div>
 
                       {/* Monthly Expenses */}
                       <CurrencyInput
                         id="monthlyExpenses"
-                        label="รายจ่ายต่อเดือน"
+                        label={t('optional.expenses')}
                         value={monthlyExpenses}
                         onChange={setMonthlyExpenses}
                         placeholder="15000"
-                        helpText="ค่าใช้จ่ายประจำ (ไม่รวมหนี้)"
+                        helpText={t('optional.expenses.help')}
                       />
                     </div>
 
@@ -457,17 +457,17 @@ export default function CreditCardCalculator() {
                       {/* Current Savings */}
                       <CurrencyInput
                         id="currentSavings"
-                        label="เงินเก็บปัจจุบัน"
+                        label={t('optional.savings')}
                         value={currentSavings}
                         onChange={setCurrentSavings}
                         placeholder="50000"
-                        helpText="เงินออมรวมทั้งหมดที่มี"
+                        helpText={t('optional.savings.help')}
                       />
 
                       {/* Emergency Fund Months */}
                       <div className="relative group">
                         <label htmlFor="emergencyMonths" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          เงินสำรองฉุกเฉิน (เดือน)
+                          {t('optional.emergency')}
                         </label>
                         <input
                           id="emergencyMonths"
@@ -480,7 +480,7 @@ export default function CreditCardCalculator() {
                           placeholder="3"
                         />
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                          ถ้าตกงาน อยู่ได้กี่เดือน?
+                          {t('optional.emergency.help')}
                         </p>
                       </div>
                     </div>
@@ -488,7 +488,7 @@ export default function CreditCardCalculator() {
                     <div className="flex items-start gap-2 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                       <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-purple-700 dark:text-purple-300">
-                        ยิ่งกรอกข้อมูลมาก AI จะวิเคราะห์ได้แม่นยำขึ้น เช่น Health Score, Stability Score, และคำแนะนำเงินสำรองฉุกเฉิน
+                        {t('optional.aiNote')}
                       </p>
                     </div>
                   </div>
