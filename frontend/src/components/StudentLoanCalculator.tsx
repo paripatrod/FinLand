@@ -298,7 +298,7 @@ export default function StudentLoanCalculator() {
         <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 leading-relaxed">{t('student.subtitle')}</p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-4 sm:p-8 lg:p-10 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 lg:p-10 rounded-2xl shadow-xl border-2 border-gray-200 dark:border-gray-700">
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-7">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <CurrencyInput
@@ -394,7 +394,7 @@ export default function StudentLoanCalculator() {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-6 space-y-6 bg-purple-50/50 dark:bg-purple-900/10">
+                  <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-purple-50/50 dark:bg-purple-900/10">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Age */}
                       <div className="relative group">

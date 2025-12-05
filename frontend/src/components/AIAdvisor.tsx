@@ -297,10 +297,11 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
 
   return (
     <div className="relative">
-      {/* Floating Button */}
+      {/* Floating Button - with safe area for iPhone */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 z-50"
+        className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 z-50"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
         title={t('advisor.title')}
       >
         <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -315,7 +316,7 @@ export default function AIAdvisor({ balance, apr, currentPayment, monthlyIncome 
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            className="fixed bottom-36 sm:bottom-24 right-2 sm:right-6 left-2 sm:left-auto w-auto sm:w-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 max-h-[70vh] sm:max-h-[600px] flex flex-col overflow-hidden"
+            className="fixed bottom-40 sm:bottom-24 right-3 sm:right-6 left-3 sm:left-auto w-auto sm:w-[400px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 max-h-[65vh] sm:max-h-[600px] flex flex-col overflow-hidden"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
