@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Download, Save, Sparkles, Calculator, Printer } from 'lucide-react'
+import { Download, Save, Sparkles, Calculator, Printer, ChevronDown, ChevronUp } from 'lucide-react'
 import { saveCalculation, saveToHistory } from '../utils/storage'
 import { useLanguage } from '../contexts/LanguageContext'
 import { apiClient } from '../utils/api'
@@ -9,7 +9,7 @@ import AIAdvisor from './AIAdvisor'
 import confetti from 'canvas-confetti'
 import CountUpNumber from './ui/CountUpNumber'
 import CurrencyInput from './ui/CurrencyInput'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { printPaymentSchedule } from '../utils/pdfExport'
 import type { CreditCardResponse, AIAnalysisResponse, WhatIfResult } from '../types'
 
@@ -26,6 +26,13 @@ export default function CreditCardCalculator() {
   const [saved, setSaved] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisResponse | null>(null)
+  
+  // Optional fields for better AI analysis
+  const [showOptional, setShowOptional] = useState(false)
+  const [age, setAge] = useState('')
+  const [monthlyExpenses, setMonthlyExpenses] = useState('')
+  const [currentSavings, setCurrentSavings] = useState('')
+  const [emergencyMonths, setEmergencyMonths] = useState('')
 
   const whatIfResult = React.useMemo<WhatIfResult | null>(() => {
     if (!result || extraPayment === 0) return null;
@@ -212,20 +219,36 @@ export default function CreditCardCalculator() {
     }
   }
 
-  async function analyzeWithAI(loanAmount: number, interestRate: number, termMonths: number, monthlyPayment: number, monthlyIncome: number) {
+  async function analyzeWithAI(loanAmount: number, interestRate: number, termMonths: number, monthlyPaymentVal: number, monthlyIncomeVal: number) {
     setAiLoading(true)
     setAiAnalysis(null)
     
     try {
+      // Validate optional fields
+      const ageVal = age ? Number(age) : 30
+      const expensesVal = monthlyExpenses ? Number(monthlyExpenses) : monthlyIncomeVal * 0.5
+      const savingsVal = currentSavings ? Number(currentSavings) : 0
+      const emergencyVal = emergencyMonths ? Number(emergencyMonths) : 0
+      
+      // Validation for optional fields
+      if (age && (ageVal < 18 || ageVal > 100)) {
+        console.warn('อายุไม่ถูกต้อง ใช้ค่า default')
+      }
+      if (monthlyExpenses && expensesVal > monthlyIncomeVal) {
+        console.warn('รายจ่ายมากกว่ารายได้')
+      }
+      
       // Call AI Analysis v4.0 (Combined with Legacy insights)
       const aiRes = await apiClient.post('/api/ai-analyze', {
         loan_amount: loanAmount,
         interest_rate: interestRate,
         term_months: termMonths,
-        monthly_payment: monthlyPayment,
-        monthly_income: monthlyIncome,
-        monthly_expenses: monthlyIncome * 0.5,
-        age: 30,
+        monthly_payment: monthlyPaymentVal,
+        monthly_income: monthlyIncomeVal,
+        monthly_expenses: expensesVal,
+        age: ageVal,
+        current_savings: savingsVal,
+        emergency_months: emergencyVal,
         job_stability: 70,
         payment_history: 80
       })
@@ -363,6 +386,115 @@ export default function CreditCardCalculator() {
               placeholder="25000"
               helpText="ใช้คำนวณสัดส่วนหนี้ต่อรายได้ (DTI)"
             />
+          </div>
+
+          {/* Optional Fields - Collapsible */}
+          <div className="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowOptional(!showOptional)}
+              className="w-full px-6 py-4 flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  ข้อมูลเพิ่มเติมเพื่อ AI วิเคราะห์แม่นยำขึ้น
+                </span>
+                <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full">
+                  ไม่บังคับ
+                </span>
+              </div>
+              {showOptional ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
+            
+            <AnimatePresence>
+              {showOptional && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 space-y-6 bg-purple-50/50 dark:bg-purple-900/10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Age */}
+                      <div className="relative group">
+                        <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          อายุ (ปี)
+                        </label>
+                        <input
+                          id="age"
+                          type="number"
+                          min="18"
+                          max="100"
+                          value={age}
+                          onChange={e => setAge(e.target.value)}
+                          className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none"
+                          placeholder="30"
+                        />
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          ใช้คำนวณ retirement planning
+                        </p>
+                      </div>
+
+                      {/* Monthly Expenses */}
+                      <CurrencyInput
+                        id="monthlyExpenses"
+                        label="รายจ่ายต่อเดือน"
+                        value={monthlyExpenses}
+                        onChange={setMonthlyExpenses}
+                        placeholder="15000"
+                        helpText="ค่าใช้จ่ายประจำ (ไม่รวมหนี้)"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Current Savings */}
+                      <CurrencyInput
+                        id="currentSavings"
+                        label="เงินเก็บปัจจุบัน"
+                        value={currentSavings}
+                        onChange={setCurrentSavings}
+                        placeholder="50000"
+                        helpText="เงินออมรวมทั้งหมดที่มี"
+                      />
+
+                      {/* Emergency Fund Months */}
+                      <div className="relative group">
+                        <label htmlFor="emergencyMonths" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          เงินสำรองฉุกเฉิน (เดือน)
+                        </label>
+                        <input
+                          id="emergencyMonths"
+                          type="number"
+                          min="0"
+                          max="24"
+                          value={emergencyMonths}
+                          onChange={e => setEmergencyMonths(e.target.value)}
+                          className="w-full px-4 py-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all outline-none"
+                          placeholder="3"
+                        />
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          ถ้าตกงาน อยู่ได้กี่เดือน?
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                      <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-purple-700 dark:text-purple-300">
+                        ยิ่งกรอกข้อมูลมาก AI จะวิเคราะห์ได้แม่นยำขึ้น เช่น Health Score, Stability Score, และคำแนะนำเงินสำรองฉุกเฉิน
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
