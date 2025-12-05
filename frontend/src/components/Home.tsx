@@ -155,8 +155,6 @@ export default function Home(){
                 <HowToStep number={1} text={t('howto.step1')} />
                 <HowToStep number={2} text={t('howto.step2')} />
                 <HowToStep number={3} text={t('howto.step3')} />
-                <HowToStep number={4} text={t('howto.step4')} />
-                <HowToStep number={5} text={t('howto.step5')} />
               </ol>
             </div>
 
